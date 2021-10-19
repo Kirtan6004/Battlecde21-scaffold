@@ -42,7 +42,7 @@ public strictfp class RobotPlayer {
             // Try/catch blocks stop unhandled exceptions, which cause your robot to freeze
             try {
                 // Here, we've separated the controls into a different method for each RobotType.
-                // You may rewrite this into your own control structure if you wish.
+                //                // You may rewrite this into your own control structure if you wish.
                 System.out.println("I'm a " + rc.getType() + "! Location " + rc.getLocation());
                 switch (rc.getType()) {
                     case ENLIGHTENMENT_CENTER: runEnlightenmentCenter(); break;
@@ -53,7 +53,7 @@ public strictfp class RobotPlayer {
 
                 // Clock.yield() makes the robot wait until the next turn, then it will perform this loop again
                 Clock.yield();
-
+ 
             } catch (Exception e) {
                 System.out.println(rc.getType() + " Exception");
                 e.printStackTrace();
@@ -88,8 +88,35 @@ public strictfp class RobotPlayer {
     }
 
     static void runSlanderer() throws GameActionException {
-        if (tryMove(randomDirection()))
-            System.out.println("I moved!");
+        RobotInfo[] enemies = rc.senseNearbyRobots(-1,rc.getTeam().opponent());
+        MapLocation location = rc.getLocation();
+        if(enemies.length > 0)
+        {
+            int dangerX = 0;
+            int dangerY = 0;
+            for(RobotInfo r : enemies)
+            {
+                if(r.getType() == RobotType.MUCKRAKER){
+                    //FLY YOU FOOLS!
+                    MapLocation enemyloc = r.getLocation();
+                    if(enemyloc.x > location.x)
+                        dangerX--;
+                    else
+                        dangerX++;
+
+                    if(enemyloc.y > location.y)
+                        dangerY--;
+                    else
+                        dangerY++;
+                }
+            }
+            MapLocation safety = location.translate(Integer.signum(dangerX),
+                    Integer.signum(dangerY));
+            tryMove(location.directionTo(safety));
+
+        }
+        else
+            tryMove(randomDirection());
     }
 
     static void runMuckraker() throws GameActionException {
