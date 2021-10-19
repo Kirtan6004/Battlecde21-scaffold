@@ -5,23 +5,25 @@ public strictfp class RobotPlayer {
     static RobotController rc;
 
     static final RobotType[] spawnableRobot = {
-        RobotType.POLITICIAN,
-        RobotType.SLANDERER,
-        RobotType.MUCKRAKER,
+            RobotType.POLITICIAN,
+            RobotType.SLANDERER,
+            RobotType.MUCKRAKER,
     };
 
     static final Direction[] directions = {
-        Direction.NORTH,
-        Direction.NORTHEAST,
-        Direction.EAST,
-        Direction.SOUTHEAST,
-        Direction.SOUTH,
-        Direction.SOUTHWEST,
-        Direction.WEST,
-        Direction.NORTHWEST,
+            Direction.NORTH,
+            Direction.NORTHEAST,
+            Direction.EAST,
+            Direction.SOUTHEAST,
+            Direction.SOUTH,
+            Direction.SOUTHWEST,
+            Direction.WEST,
+            Direction.NORTHWEST,
     };
 
     static int turnCount;
+
+    static int lastRobot = 0;
 
     /**
      * run() is the method that is called when a robot is instantiated in the Battlecode world.
@@ -62,15 +64,49 @@ public strictfp class RobotPlayer {
     }
 
     static void runEnlightenmentCenter() throws GameActionException {
-        RobotType toBuild = randomSpawnableRobotType();
+        RobotType toBuild1 = RobotType.POLITICIAN;
+        RobotType toBuild2 = RobotType.SLANDERER;
+        RobotType toBuild3 = RobotType.MUCKRAKER;
+
+        int votes;
         int influence = 50;
+        int flagValue = 0;
+
+        votes = rc.getTeamVotes();
         for (Direction dir : directions) {
-            if (rc.canBuildRobot(toBuild, dir, influence)) {
-                rc.buildRobot(toBuild, dir, influence);
+            if ((lastRobot == 0 || lastRobot == 3) && rc.canBuildRobot(toBuild1, dir, influence)) {
+                rc.buildRobot(toBuild1, dir, influence);
+                lastRobot = 1;
+                if (rc.canSetFlag(flagValue++) && Clock.getBytecodesLeft() > 0)
+                {
+                    rc.setFlag(flagValue);
+                }
+            } else if ((lastRobot == 1) && rc.canBuildRobot(toBuild2, dir, influence)) {
+                rc.buildRobot(toBuild2, dir, influence);
+                lastRobot = 2;
+                if (rc.canSetFlag(flagValue++) && Clock.getBytecodesLeft() > 0)
+                {
+                    rc.setFlag(flagValue);
+                }
+            } else if ((lastRobot == 2) && rc.canBuildRobot(toBuild3, dir, influence)) {
+                rc.buildRobot(toBuild3, dir, influence);
+                lastRobot = 3;
+                if (rc.canSetFlag(flagValue++) && Clock.getBytecodesLeft() > 0)
+                {
+                    rc.setFlag(flagValue);
+                }
             } else {
                 break;
             }
         }
+
+        int leftoverInfluence = rc.getInfluence();
+        if (leftoverInfluence > 50)
+        {
+            int bid_num = leftoverInfluence - 50;
+            rc.bid(bid_num);
+        }
+        int byteCodeLeft = Clock.getBytecodesLeft();
     }
 
     static void runPolitician() throws GameActionException {
