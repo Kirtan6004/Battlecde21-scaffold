@@ -82,6 +82,12 @@ public strictfp class RobotPlayer {
                 break;
             }
         }
+        int leftoverInfluence = rc.getInfluence();
+        if (leftoverInfluence > 50)
+        {
+            int bid_num = leftoverInfluence - 50;
+            rc.bid(bid_num);
+        }
 
     }
 
