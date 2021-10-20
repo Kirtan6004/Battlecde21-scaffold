@@ -1,4 +1,4 @@
-package SubmitBot;
+package Team2;
 import battlecode.common.*;
 
 import java.util.HashSet;
