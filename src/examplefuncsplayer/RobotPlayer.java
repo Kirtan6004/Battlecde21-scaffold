@@ -1,5 +1,8 @@
-package examplefuncsplayer;
+package SubmitBot;
 import battlecode.common.*;
+
+import java.util.HashSet;
+import java.util.Set;
 
 public strictfp class RobotPlayer {
     static RobotController rc;
@@ -22,6 +25,13 @@ public strictfp class RobotPlayer {
     };
 
     static int turnCount;
+    // Add New Var on here
+    static MapLocation enemyBaseLoc = new MapLocation(0, 0);
+    static int homeID;
+    static MapLocation homeLoc;
+    static Direction directionality = Direction.CENTER;
+
+    static Set<Integer> flagsSeen = new HashSet<Integer>();
 
     static int lastRobot = 0;
 
@@ -110,10 +120,35 @@ public strictfp class RobotPlayer {
     }
 
     static void runPolitician() throws GameActionException {
-        Team enemy = rc.getTeam().opponent();
+        Team enemyTeam = rc.getTeam().opponent();
+        Team allyTeam = rc.getTeam();
+
+
         int actionRadius = rc.getType().actionRadiusSquared;
-        RobotInfo[] attackable = rc.senseNearbyRobots(actionRadius, enemy);
-        if (attackable.length != 0 && rc.canEmpower(actionRadius)) {
+        RobotInfo[] attackable = rc.senseNearbyRobots(actionRadius, enemyTeam);
+
+        if (turnCount <= 12) {
+            for (RobotInfo ally :rc.senseNearbyRobots(2, allyTeam)) {
+                if (ally.getType().canBid()){
+                    homeID = ally.getID();
+                    homeLoc = ally.getLocation();
+                }
+            }
+        } else if (turnCount > 800) {
+            directionality = Direction.CENTER;
+        }
+
+        // Can attack an enemy base or muckraker
+        for (RobotInfo enemy : attackable) {
+            if (enemy.type == RobotType.ENLIGHTENMENT_CENTER){
+                if (rc.canEmpower(actionRadius)){
+                    rc.empower(actionRadius);
+                    return;
+                }
+            }
+        }
+
+        if (attackable.length != 3 && rc.canEmpower(actionRadius)) {
             System.out.println("empowering...");
             rc.empower(actionRadius);
             System.out.println("empowered");
