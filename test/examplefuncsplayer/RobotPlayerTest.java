@@ -2,9 +2,8 @@ package examplefuncsplayer;
 
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.mock;
-import static team2.RobotPlayer.lastRobot;
+import static Team2.RobotPlayer.lastRobot;
 
-import battlecode.common.Clock;
 import battlecode.common.GameActionException;
 import battlecode.common.RobotController;
 import battlecode.common.RobotType;
