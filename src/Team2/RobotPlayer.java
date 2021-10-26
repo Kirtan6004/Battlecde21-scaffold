@@ -1,4 +1,4 @@
-package SubmitBot;
+package team2;
 import battlecode.common.*;
 
 import java.util.HashSet;
@@ -33,7 +33,7 @@ public strictfp class RobotPlayer {
 
     static Set<Integer> flagsSeen = new HashSet<Integer>();
 
-    static int lastRobot = 0;
+    public static int lastRobot = 0;
 
     /**
      * run() is the method that is called when a robot is instantiated in the Battlecode world.
