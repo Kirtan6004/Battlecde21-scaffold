@@ -193,18 +193,35 @@ public strictfp class RobotPlayer {
     static void runMuckraker() throws GameActionException {
         Team enemy = rc.getTeam().opponent();
         int actionRadius = rc.getType().actionRadiusSquared;
+
         for (RobotInfo robot : rc.senseNearbyRobots(actionRadius, enemy)) {
-            if (robot.type.canBeExposed()) {
-                // It's a slanderer... go get them!
-                if (rc.canExpose(robot.location)) {
-                    System.out.println("e x p o s e d");
-                    rc.expose(robot.location);
+            if(robot.type == RobotType.SLANDERER){
+                //expose it if its in range
+                if (robot.type.canBeExposed())
+                {
+                    if (rc.canExpose(robot.location))
+                    {
+                        rc.expose(robot.location);
+                        return;
+                    }
+                }
+                //otherwise chase slanderer
+                tryMove(rc.getLocation().directionTo(robot.getLocation()));
+                return;
+            }
+            //Check for Unclaimed EC's and head to them
+            if(robot.getType() == RobotType.ENLIGHTENMENT_CENTER)
+            {
+                if(robot.getTeam() == Team.NEUTRAL)
+                {
+                    tryMove(rc.getLocation().directionTo(robot.getLocation()));
                     return;
                 }
+                //attack enemy ECs?
             }
         }
-        if (tryMove(randomDirection()))
-            System.out.println("I moved!");
+        //Move randomly if it can't see anything
+        tryMove(randomDirection());
     }
 
     /**
