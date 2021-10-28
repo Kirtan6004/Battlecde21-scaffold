@@ -1,6 +1,9 @@
 package Team2;
 import battlecode.common.*;
 
+import java.util.HashSet;
+import java.util.Set;
+
 public strictfp class RobotPlayer {
     static RobotController rc;
 
@@ -23,17 +26,21 @@ public strictfp class RobotPlayer {
 
     static int turnCount;
     // Add New Var on here
-    // static MapLocation enemyBaseLoc = new MapLocation(0, 0);
+    static MapLocation enemyBaseLoc = new MapLocation(0, 0);
     static int homeID;
     static MapLocation homeLoc;
     static Direction directionality = Direction.CENTER;
 
-    // static Set<Integer> flagsSeen = new HashSet<Integer>();
+    static Set<Integer> flagsSeen = new HashSet<Integer>();
 
     public static int lastRobot = 0;
     public static int infBeforeBid;
     public static int infAfterBid ;
 
+    /**
+     * run() is the method that is called when a robot is instantiated in the Battlecode world.
+     * If this method returns, the robot dies!
+     **/
     @SuppressWarnings("unused")
     public static void run(RobotController rc) throws GameActionException {
 
@@ -73,11 +80,11 @@ public strictfp class RobotPlayer {
         RobotType toBuild2 = RobotType.SLANDERER;
         RobotType toBuild3 = RobotType.MUCKRAKER;
 
-        // int votes;
+        int votes;
         int influence = 50;
         int flagValue = 0;
 
-        // votes = rc.getTeamVotes();
+        votes = rc.getTeamVotes();
         for (Direction dir : directions) {
             if ((lastRobot == 0 || lastRobot == 3) && rc.canBuildRobot(toBuild1, dir, influence)) {
                 rc.buildRobot(toBuild1, dir, influence);
@@ -109,7 +116,7 @@ public strictfp class RobotPlayer {
             int bid_num = infBeforeBid - 50;
             rc.bid(bid_num);
         }
-        // int byteCodeLeft = Clock.getBytecodesLeft();
+        int byteCodeLeft = Clock.getBytecodesLeft();
         infAfterBid = rc.getInfluence();
     }
 
@@ -201,10 +208,31 @@ public strictfp class RobotPlayer {
             System.out.println("I moved!");
     }
 
+    /**
+     * Returns a random Direction.
+     *
+     * @return a random Direction
+     */
     static Direction randomDirection() {
         return directions[(int) (Math.random() * directions.length)];
     }
 
+    /**
+     * Returns a random spawnable RobotType
+     *
+     * @return a random RobotType
+     */
+    static RobotType randomSpawnableRobotType() {
+        return spawnableRobot[(int) (Math.random() * spawnableRobot.length)];
+    }
+
+    /**
+     * Attempts to move in a given direction.
+     *
+     * @param dir The intended direction of movement
+     * @return true if a move was performed
+     * @throws GameActionException
+     */
     static boolean tryMove(Direction dir) throws GameActionException {
         System.out.println("I am trying to move " + dir + "; " + rc.isReady() + " " + rc.getCooldownTurns() + " " + rc.canMove(dir));
         if (rc.canMove(dir)) {
