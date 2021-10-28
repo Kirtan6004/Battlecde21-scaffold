@@ -1,8 +1,8 @@
 package Team2;
 import battlecode.common.*;
 
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
+
 
 public strictfp class RobotPlayer {
     static RobotController rc;
@@ -35,6 +35,10 @@ public strictfp class RobotPlayer {
 
     static int lastRobot = 0;
 
+    //keep track of the known neutralECs
+    static Set<MapLocation> neutralECs = new HashSet<MapLocation>();
+
+
     /**
      * run() is the method that is called when a robot is instantiated in the Battlecode world.
      * If this method returns, the robot dies!
@@ -48,14 +52,14 @@ public strictfp class RobotPlayer {
 
         turnCount = 0;
 
-        System.out.println("I'm a " + rc.getType() + " and I just got created!");
+        //System.out.println("I'm a " + rc.getType() + " and I just got created!");
         while (true) {
             turnCount += 1;
             // Try/catch blocks stop unhandled exceptions, which cause your robot to freeze
             try {
                 // Here, we've separated the controls into a different method for each RobotType.
                 //                // You may rewrite this into your own control structure if you wish.
-                System.out.println("I'm a " + rc.getType() + "! Location " + rc.getLocation());
+                //System.out.println("I'm a " + rc.getType() + "! Location " + rc.getLocation());
                 switch (rc.getType()) {
                     case ENLIGHTENMENT_CENTER: runEnlightenmentCenter(); break;
                     case POLITICIAN:           runPolitician();          break;
@@ -192,34 +196,38 @@ public strictfp class RobotPlayer {
 
     static void runMuckraker() throws GameActionException {
         Team enemy = rc.getTeam().opponent();
-        int actionRadius = rc.getType().actionRadiusSquared;
+        int detectRadius = rc.getType().detectionRadiusSquared;
 
-        for (RobotInfo robot : rc.senseNearbyRobots(actionRadius, enemy)) {
-            if(robot.type == RobotType.SLANDERER){
-                //expose it if its in range
-                if (robot.type.canBeExposed())
-                {
-                    if (rc.canExpose(robot.location))
+        for (RobotInfo robot : rc.senseNearbyRobots(detectRadius)) {
+            if(robot.team.equals(enemy)){
+                if(robot.type.equals(RobotType.SLANDERER)){
+                    //expose it if its in range
+                    if (robot.type.canBeExposed())
                     {
-                        rc.expose(robot.location);
-                        return;
+                        if (rc.canExpose(robot.location))
+                        {
+                            rc.expose(robot.location);
+                            System.out.println("Exposed you!");
+                            return;
+                        }
                     }
-                }
-                //otherwise chase slanderer
-                tryMove(rc.getLocation().directionTo(robot.getLocation()));
-                return;
-            }
-            //Check for Unclaimed EC's and head to them
-            if(robot.getType() == RobotType.ENLIGHTENMENT_CENTER)
-            {
-                if(robot.getTeam() == Team.NEUTRAL)
-                {
+                    //otherwise chase slanderer
                     tryMove(rc.getLocation().directionTo(robot.getLocation()));
                     return;
                 }
-                //attack enemy ECs?
+            }
+
+            //Check for Unclaimed EC's and head to them
+            if(robot.type.equals(RobotType.ENLIGHTENMENT_CENTER))
+            {
+                if(robot.team.equals(Team.NEUTRAL))
+                {
+                    if(addNeutralEC(robot.location))
+                        System.out.println("I'm Helping! " + neutralECs.size());
+                }
             }
         }
+
         //Move randomly if it can't see anything
         tryMove(randomDirection());
     }
@@ -250,10 +258,19 @@ public strictfp class RobotPlayer {
      * @throws GameActionException
      */
     static boolean tryMove(Direction dir) throws GameActionException {
-        System.out.println("I am trying to move " + dir + "; " + rc.isReady() + " " + rc.getCooldownTurns() + " " + rc.canMove(dir));
+        //System.out.println("I am trying to move " + dir + "; " + rc.isReady() + " " + rc.getCooldownTurns() + " " + rc.canMove(dir));
         if (rc.canMove(dir)) {
             rc.move(dir);
             return true;
         } else return false;
+    }
+
+
+    static boolean addNeutralEC(MapLocation ml){
+        return neutralECs.add(ml);
+    }
+
+    static void removeNeutralEC(MapLocation ml){
+        neutralECs.remove(ml);
     }
 }
