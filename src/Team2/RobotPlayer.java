@@ -5,7 +5,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 public strictfp class RobotPlayer {
-    static RobotController rc;
+     static RobotController rc;
 
     static final RobotType[] spawnableRobot = {
             RobotType.POLITICIAN,
@@ -45,7 +45,6 @@ public strictfp class RobotPlayer {
         // This is the RobotController object. You use it to perform actions from this robot,
         // and to get information on its current status.
         RobotPlayer.rc = rc;
-
         turnCount = 0;
 
         System.out.println("I'm a " + rc.getType() + " and I just got created!");
@@ -160,6 +159,7 @@ public strictfp class RobotPlayer {
 
     static void runSlanderer() throws GameActionException {
         RobotInfo[] enemies = rc.senseNearbyRobots(-1,rc.getTeam().opponent());
+
         MapLocation location = rc.getLocation();
         if(enemies.length > 0)
         {
