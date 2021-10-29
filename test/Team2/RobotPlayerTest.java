@@ -91,14 +91,19 @@ public class RobotPlayerTest {
 		assertTrue(enemies.length > 0);
 		int dangerX = 0;
 		int dangerY = 0;
-		assertTrue(enemies[0].getType() == RobotType.MUCKRAKER);
-		int temp = 0;
-		assertEquals(enemies[0].getLocation(), enemylocation);
-		assertTrue(enemies[0].getLocation().x > mapLocation.x);
-		int newdangerX = dangerX-1;
-		assertEquals(-1, dangerX-1);
-		assertFalse(enemies[0].getLocation().x < mapLocation.x);
-		newdangerX = dangerX+1;
-		assertEquals(1, dangerX+1);
+		for (RobotInfo r : enemies)
+		{
+			assertTrue(r.getType() == RobotType.MUCKRAKER);
+			int temp = 0;
+			assertEquals(r.getLocation(), enemylocation);
+			assertTrue(r.getLocation().x > mapLocation.x);
+			int newdangerX = dangerX-1;
+			assertEquals(-1, dangerX-1);
+			assertFalse(r.getLocation().x < mapLocation.x);
+			newdangerX = dangerX+1;
+			assertEquals(1, dangerX+1);
+		}
+
+
 	}
 }
