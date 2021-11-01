@@ -207,10 +207,10 @@ public strictfp class RobotPlayer {
     }
     static int dealWithSlanderer(RobotInfo[] robots) throws GameActionException
     {
+        int retVal = -1;
         for(RobotInfo r : robots){
             if(!r.type.equals(RobotType.SLANDERER))
-                return -1;
-
+                continue;
             Team enemy = rc.getTeam().opponent();
             //expose it if its in range
             if(r.team.equals(enemy)){
@@ -219,35 +219,36 @@ public strictfp class RobotPlayer {
                     if (rc.canExpose(r.location))
                     {
                         rc.expose(r.location);
-                        System.out.println("Exposed you!");
-                        return 1;
+                        //System.out.println("Exposed you!");
+                        retVal = 1;
                     }
                 }
                 //otherwise chase slanderer
                 tryMove(rc.getLocation().directionTo(r.getLocation()));
-                return 2;
+                retVal = (retVal == 1) ? 1 : 2;
             }
         }
-        return -1;
+        return retVal;
     }
 
     static int dealWithEnlightenmentCenters(RobotInfo[] robots)
     {
+        int retVal = -1;
         for(RobotInfo r : robots)
         {
             if (!r.type.equals(RobotType.ENLIGHTENMENT_CENTER))
-                return -1;
+                continue;
             if (r.team.equals(Team.NEUTRAL))
             {
                 if (addNeutralEC(r.location))
                 {
-                    System.out.println("I'm Helping! " + neutralECs.size());
-                    return 1;
+                    //System.out.println("I'm Helping! " + neutralECs.size());
+                    retVal = 1;
                 }
-                return 2;
             }
+            retVal = (retVal == 1) ? 1 : 2;
         }
-        return -1;
+        return retVal;
     }
 
     /**
