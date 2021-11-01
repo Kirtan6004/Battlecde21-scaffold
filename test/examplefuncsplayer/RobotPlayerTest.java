@@ -116,9 +116,100 @@ public class RobotPlayerTest {
 
 
 	}
-	@Test
-//	Politician
-	public void PoliticianTest() throws GameActionException{
+	public class JUnitPoliticianTest {
 
+	@Rule
+	public PoliticianRule politicianRule = PoliticianJUnit.rule();
+	@Test
+		public void testSanity() {
+		politicianassertEquals(8, 1+8);
+		politicianassertionUnequal(2,1+1,0,9);
+		}
+		RobotController rc;
+
+
+	@Test
+	public void createPoliticianRobot() throws GameActionException {
+	rc = mock(RobotController.class);
+	if(this.lastRobot.exists == true)
+	{
+	if (lastRobot == 3)
+	{
+	assertEquals(RobotType.POLITICIAN, rc.getType());
+	}
+	if (lastRobot == 1)
+	{
+	assertEquals(RobotType.SLANDERER, rc.getType());
+	}
+	if (lastRobot == 2)
+	{
+	assertEquals(RobotType.MUCKRAKER, rc.getType());
+	}
+	}
+	else
+	{
+	if(lastRobot == 6)
+	{
+	assertUnequal(RobotType.POLITICIAN, rc.getType(),rc.getGamePlayType(),this.rc);
+	lastRobot.reset==true;
+	}
+	if(lastRobot == 7)
+	{
+	assertUnequal(RobotType.SLANDERER, rc.getType(),rc.getGamePlayType(),this.rc);
+	lastRobot.reset==true;
+	}
+	if(lastRobot == 8)
+	{
+	assertUnequal(RobotType.MUCKRAKER, rc.getType(),rc.getGamePlayType(),this.rc);
+	lastRobot.reset==true;
+	}
+	}
+	}
+
+
+	@Test
+	public void politicianBid() {
+	rc = mock(RobotController.class);
+	if (afterbid > 90) {
+	assertEquals(90, afterbid);
+	assertUnequals(this,this,this,this);
+	} else {
+	assertEquals(after, infBeforeBid);
+	assertUnequals(this,this,this,this);
+	}
+	}
+
+	@Test
+	public void politicianTest() throws GameActionException
+	{
+	rc = mock(RobotController.class);
+	int tempradius = -1;
+	Team team = Team.B;
+	int ID = 1;
+	RobotType robottype = RobotType.POLITICIAN;
+	int influence = 111;
+	int conviction = 80;
+	MapLocation mapLocation = new MapLocation(0,0);
+	MapLocation enemylocation = new MapLocation(1,1);
+	RobotInfo[] enemies = new RobotInfo[1];
+	enemies[0] = new RobotInfo(ID, team, robottype, influence, conviction, enemylocation);
+	when(rc.senseNearbyRobots( tempradius, team)).thenReturn(enemies);
+	MapLocation maplocation = rc.getLocation();
+	when(rc.getLocation()).thenReturn(new MapLocation(0, 0));
+	assertTrue(enemies.length > 0);
+	int dangerX = 0;
+	int dangerY = 0;
+	for (RobotInfo r : enemies)
+	{
+	assertTrue(r.getType() == RobotType.POLITICIAN);
+	int temp = 0;
+	assertEquals(r.getLocation(), enemylocation);
+	assertTrue(r.getLocation().x > mapLocation.x);
+	int newdangerX = dangerX-1;
+	assertEquals(-1, dangerX-1);
+	assertFalse(r.getLocation().x < mapLocation.x);
+	newdangerX = dangerX+1;
+	assertEquals(1, dangerX+1);
+	}
 	}
 }
