@@ -197,39 +197,57 @@ public strictfp class RobotPlayer {
     static void runMuckraker() throws GameActionException {
         Team enemy = rc.getTeam().opponent();
         int detectRadius = rc.getType().detectionRadiusSquared;
-
-        for (RobotInfo robot : rc.senseNearbyRobots(detectRadius)) {
-            if(robot.team.equals(enemy)){
-                if(robot.type.equals(RobotType.SLANDERER)){
-                    //expose it if its in range
-                    if (robot.type.canBeExposed())
-                    {
-                        if (rc.canExpose(robot.location))
-                        {
-                            rc.expose(robot.location);
-                            System.out.println("Exposed you!");
-                            return;
-                        }
-                    }
-                    //otherwise chase slanderer
-                    tryMove(rc.getLocation().directionTo(robot.getLocation()));
-                    return;
-                }
-            }
-
-            //Check for Unclaimed EC's and head to them
-            if(robot.type.equals(RobotType.ENLIGHTENMENT_CENTER))
-            {
-                if(robot.team.equals(Team.NEUTRAL))
-                {
-                    if(addNeutralEC(robot.location))
-                        System.out.println("I'm Helping! " + neutralECs.size());
-                }
-            }
-        }
-
+        RobotInfo[] robots = rc.senseNearbyRobots(detectRadius);
+            if(dealWithSlanderer(robots) != -1)
+                return;
+            else
+                dealWithEnlightenmentCenters(robots);
         //Move randomly if it can't see anything
         tryMove(randomDirection());
+    }
+    static int dealWithSlanderer(RobotInfo[] robots) throws GameActionException
+    {
+        for(RobotInfo r : robots){
+            if(!r.type.equals(RobotType.SLANDERER))
+                return -1;
+
+            Team enemy = rc.getTeam().opponent();
+            //expose it if its in range
+            if(r.team.equals(enemy)){
+                if (r.type.canBeExposed())
+                {
+                    if (rc.canExpose(r.location))
+                    {
+                        rc.expose(r.location);
+                        System.out.println("Exposed you!");
+                        return 1;
+                    }
+                }
+                //otherwise chase slanderer
+                tryMove(rc.getLocation().directionTo(r.getLocation()));
+                return 2;
+            }
+        }
+        return -1;
+    }
+
+    static int dealWithEnlightenmentCenters(RobotInfo[] robots)
+    {
+        for(RobotInfo r : robots)
+        {
+            if (!r.type.equals(RobotType.ENLIGHTENMENT_CENTER))
+                return -1;
+            if (r.team.equals(Team.NEUTRAL))
+            {
+                if (addNeutralEC(r.location))
+                {
+                    System.out.println("I'm Helping! " + neutralECs.size());
+                    return 1;
+                }
+                return 2;
+            }
+        }
+        return -1;
     }
 
     /**
