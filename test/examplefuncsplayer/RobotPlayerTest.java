@@ -67,6 +67,16 @@ public class RobotPlayerTest {
 			assertEquals(RobotType.MUCKRAKER, rc.getType());
 		}
 	}
+	
+	@Test
+	public void testBid() {
+		rc = mock(RobotController.class);
+		if (infBeforeBid > 50) {
+			assertEquals(50, infAfterBid);
+		} else {
+			assertEquals(infBeforeBid, infAfterBid);
+		}
+	}
 
 	@Test
 	public void SlanderersTest() throws GameActionException
