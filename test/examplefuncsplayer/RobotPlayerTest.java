@@ -184,16 +184,7 @@ public class RobotPlayerTest {
 		}
 
 	}
-		@Test
-		public void politicianBid() {
-			rc = mock(RobotController.class);
-			if (afterbid > 90) {
-				assertEquals(90, afterbid);
-
-			} else {
-				assertEquals(after, infBeforeBid);
-			}
-		}
+		
 
 		@Test
 		public void politicianTest() throws GameActionException
