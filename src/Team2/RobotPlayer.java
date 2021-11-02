@@ -1,11 +1,11 @@
 package Team2;
 import battlecode.common.*;
 
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
+
 
 public strictfp class RobotPlayer {
-     static RobotController rc;
+    static RobotController rc;
 
     static final RobotType[] spawnableRobot = {
             RobotType.POLITICIAN,
@@ -35,6 +35,10 @@ public strictfp class RobotPlayer {
 
     static int lastRobot = 0;
 
+    //keep track of the known neutralECs
+    static Set<MapLocation> neutralECs = new HashSet<MapLocation>();
+
+
     /**
      * run() is the method that is called when a robot is instantiated in the Battlecode world.
      * If this method returns, the robot dies!
@@ -45,16 +49,17 @@ public strictfp class RobotPlayer {
         // This is the RobotController object. You use it to perform actions from this robot,
         // and to get information on its current status.
         RobotPlayer.rc = rc;
+
         turnCount = 0;
 
-        System.out.println("I'm a " + rc.getType() + " and I just got created!");
+        //System.out.println("I'm a " + rc.getType() + " and I just got created!");
         while (true) {
             turnCount += 1;
             // Try/catch blocks stop unhandled exceptions, which cause your robot to freeze
             try {
                 // Here, we've separated the controls into a different method for each RobotType.
                 //                // You may rewrite this into your own control structure if you wish.
-                System.out.println("I'm a " + rc.getType() + "! Location " + rc.getLocation());
+                //System.out.println("I'm a " + rc.getType() + "! Location " + rc.getLocation());
                 switch (rc.getType()) {
                     case ENLIGHTENMENT_CENTER: runEnlightenmentCenter(); break;
                     case POLITICIAN:           runPolitician();          break;
@@ -80,7 +85,6 @@ public strictfp class RobotPlayer {
         int votes;
         int influence = 50;
         int flagValue = 0;
-        runSlanderer();
 
         votes = rc.getTeamVotes();
         for (Direction dir : directions) {
@@ -161,16 +165,10 @@ public strictfp class RobotPlayer {
     static void runSlanderer() throws GameActionException {
         RobotInfo[] enemies = rc.senseNearbyRobots(-1,rc.getTeam().opponent());
         MapLocation location = rc.getLocation();
-        int result = WhenOpponentsAreFound(enemies, location, rc);
-    }
-
-    static int WhenOpponentsAreFound(RobotInfo[] enemies, MapLocation location, RobotController rctemp) throws GameActionException
-    {
-        rc = rctemp;
-        int dangerX = 0;
-        int dangerY = 0;
-        if (enemies.length > 0)
+        if(enemies.length > 0)
         {
+            int dangerX = 0;
+            int dangerY = 0;
             for(RobotInfo r : enemies)
             {
                 if(r.getType() == RobotType.MUCKRAKER){
@@ -190,31 +188,67 @@ public strictfp class RobotPlayer {
             MapLocation safety = location.translate(Integer.signum(dangerX),
                     Integer.signum(dangerY));
             tryMove(location.directionTo(safety));
-            return 1;
+
         }
         else
-        {
             tryMove(randomDirection());
-            return -1;
-        }
-
     }
 
     static void runMuckraker() throws GameActionException {
         Team enemy = rc.getTeam().opponent();
-        int actionRadius = rc.getType().actionRadiusSquared;
-        for (RobotInfo robot : rc.senseNearbyRobots(actionRadius, enemy)) {
-            if (robot.type.canBeExposed()) {
-                // It's a slanderer... go get them!
-                if (rc.canExpose(robot.location)) {
-                    System.out.println("e x p o s e d");
-                    rc.expose(robot.location);
-                    return;
+        int detectRadius = rc.getType().detectionRadiusSquared;
+        RobotInfo[] robots = rc.senseNearbyRobots(detectRadius);
+            if(dealWithSlanderer(robots) != -1)
+                return;
+            else
+                dealWithEnlightenmentCenters(robots);
+        //Move randomly if it can't see anything
+        tryMove(randomDirection());
+    }
+    static int dealWithSlanderer(RobotInfo[] robots) throws GameActionException
+    {
+        int retVal = -1;
+        for(RobotInfo r : robots){
+            if(!r.type.equals(RobotType.SLANDERER))
+                continue;
+            Team enemy = rc.getTeam().opponent();
+            //expose it if its in range
+            if(r.team.equals(enemy)){
+                if (r.type.canBeExposed())
+                {
+                    if (rc.canExpose(r.location))
+                    {
+                        rc.expose(r.location);
+                        //System.out.println("Exposed you!");
+                        retVal = 1;
+                    }
                 }
+                //otherwise chase slanderer
+                tryMove(rc.getLocation().directionTo(r.getLocation()));
+                retVal = (retVal == 1) ? 1 : 2;
             }
         }
-        if (tryMove(randomDirection()))
-            System.out.println("I moved!");
+        return retVal;
+    }
+
+    static int dealWithEnlightenmentCenters(RobotInfo[] robots)
+    {
+        int retVal = -1;
+        for(RobotInfo r : robots)
+        {
+            if (!r.type.equals(RobotType.ENLIGHTENMENT_CENTER))
+                continue;
+            if (r.team.equals(Team.NEUTRAL))
+            {
+                if (addNeutralEC(r.location))
+                {
+                    //System.out.println("I'm Helping! " + neutralECs.size());
+                    retVal = 1;
+                }
+            }
+            retVal = (retVal == 1) ? 1 : 2;
+        }
+        return retVal;
     }
 
     /**
@@ -243,18 +277,19 @@ public strictfp class RobotPlayer {
      * @throws GameActionException
      */
     static boolean tryMove(Direction dir) throws GameActionException {
-        if (rc == null)
-        {
-            return false;
-        }
-        else
-        {
-            System.out.println("I am trying to move " + dir + "; " + rc.isReady() + " " + rc.getCooldownTurns() + " " + rc.canMove(dir));
-            if (rc.canMove(dir)) {
-                rc.move(dir);
-                return true;
-            } else return false;
-        }
+        //System.out.println("I am trying to move " + dir + "; " + rc.isReady() + " " + rc.getCooldownTurns() + " " + rc.canMove(dir));
+        if (rc.canMove(dir)) {
+            rc.move(dir);
+            return true;
+        } else return false;
+    }
 
+
+    static boolean addNeutralEC(MapLocation ml){
+        return neutralECs.add(ml);
+    }
+
+    static void removeNeutralEC(MapLocation ml){
+        neutralECs.remove(ml);
     }
 }
