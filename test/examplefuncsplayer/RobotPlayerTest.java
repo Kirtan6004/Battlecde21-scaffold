@@ -170,19 +170,24 @@ public class RobotPlayerTest {
 		@Test
 		public void politicianTest() throws GameActionException
 		{
+			testplayer = mock(RobotPlayer.class);
+			testplayer.rc = mock(RobotController.class);
+			when(testplayer.rc.getType()).thenReturn(RobotType.POLITICIAN);
+			when(testplayer.rc.getTeam()).thenReturn(Team.A);
+			when(testplayer.rc.getLocation()).thenReturn(new MapLocation(0,0));
+
 			rc = mock(RobotController.class);
-			int actionRadius = rc.getType().actionRadiusSquared;
-			Team enemyTeam = rc.getTeam().opponent();
-			Team allyTeam = rc.getTeam();
+			Team teamB = Team.B;
 			int ID = 1;
+			int tempradius = -1;
 			RobotType robottype = RobotType.POLITICIAN;
 			int influence = 111;
 			int conviction = 80;
 			MapLocation mapLocation = new MapLocation(0,0);
 			MapLocation enemylocation = new MapLocation(1,1);
 			RobotInfo[] enemies = new RobotInfo[1];
-			enemies[0] = new RobotInfo(ID, enemyTeam, robottype, influence, conviction, enemylocation);
-			when(rc.senseNearbyRobots( actionRadius, enemyTeam)).thenReturn(enemies);
+			enemies[0] = new RobotInfo(ID, teamB, robottype, influence, conviction, enemylocation);
+			when(rc.senseNearbyRobots( tempradius, teamB)).thenReturn(enemies);
 			MapLocation maplocation = rc.getLocation();
 			when(rc.getLocation()).thenReturn(new MapLocation(0, 0));
 			assertTrue(enemies.length > 0);
@@ -202,20 +207,16 @@ public class RobotPlayerTest {
 			}
 
 			if (turnCount <= 12) {
-				for (RobotInfo ally :rc.senseNearbyRobots(2, allyTeam)) {
-					if (ally.getType().canBid()){
-						homeID = ally.getID();
-						homeLoc = ally.getLocation();
-					}
+					directionality = Direction.EAST;
 				}
-			} else if (turnCount > 800) {
-				directionality = Direction.CENTER;
+			 else if (turnCount > 800) {
+				directionality = Direction.WEST;
 			}
 
 			if(turnCount >12 && turnCount <=800)
 			{
 				directionality = Direction.CENTER;
-				if(allyTeam.isPlayer())
+				if(teamB.isPlayer())
 				{
 					return;
 				}
