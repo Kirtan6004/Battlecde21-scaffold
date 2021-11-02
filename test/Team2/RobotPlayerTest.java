@@ -66,35 +66,34 @@ public class RobotPlayerTest {
 		assertEquals(2,reaction);
 	}
 	RobotController rc;
-	RobotPlayer testplayer;
-
 
 	@Test
 	public void testRobotCreation() throws GameActionException {
-		testPlayer = mock(RobotPlayer.class);
-		testPlayer.rc = mock(RobotController.class);
+		testplayer = mock(RobotPlayer.class);
+		testplayer.rc = mock(RobotController.class);
 
-		if (testPlayer.rc.getInfluence() >= 50) {
-			testPlayer.runEnlightenmentCenter();
-			RobotType type0 = testPlayer.makeRobots(0, Direction.NORTHEAST);
+		if (testplayer.rc.getInfluence() >= 50) {
+			testplayer.runEnlightenmentCenter();
+			RobotType type0 = testplayer.makeRobots(0, Direction.NORTHEAST);
 			assertEquals(RobotType.POLITICIAN, type0);
-			RobotType type1 = testPlayer.makeRobots(1, Direction.NORTHEAST);
+			RobotType type1 = testplayer.makeRobots(1, Direction.NORTHEAST);
 			assertEquals(RobotType.SLANDERER, type1);
-			RobotType type2 = testPlayer.makeRobots(2, Direction.NORTHEAST);
+			RobotType type2 = testplayer.makeRobots(2, Direction.NORTHEAST);
 			assertEquals(RobotType.MUCKRAKER, type2);
-			RobotType type3 = testPlayer.makeRobots(3, Direction.NORTHEAST);
+			RobotType type3 = testplayer.makeRobots(3, Direction.NORTHEAST);
 			assertEquals(RobotType.POLITICIAN, type3);
-		}
-		else {
-			testPlayer.runEnlightenmentCenter();
-			RobotType type0 = testPlayer.makeRobots(0, Direction.NORTHEAST);
+		} else {
+			testplayer.runEnlightenmentCenter();
+			RobotType type0 = testplayer.makeRobots(0, Direction.NORTHEAST);
 			assertEquals(null, type0);
-			RobotType type1 = testPlayer.makeRobots(1, Direction.NORTHEAST);
+			RobotType type1 = testplayer.makeRobots(1, Direction.NORTHEAST);
 			assertEquals(null, type1);
-			RobotType type2 = testPlayer.makeRobots(2, Direction.NORTHEAST);
+			RobotType type2 = testplayer.makeRobots(2, Direction.NORTHEAST);
 			assertEquals(null, type2);
-			RobotType type3 = testPlayer.makeRobots(3, Direction.NORTHEAST);
+			RobotType type3 = testplayer.makeRobots(3, Direction.NORTHEAST);
 			assertEquals(null, type3);
+		}
+	}
 
 	@Test
 	public void runTest() throws GameActionException {
