@@ -33,7 +33,7 @@ public strictfp class RobotPlayer {
 
     static Set<Integer> flagsSeen = new HashSet<Integer>();
 
-    static int lastRobot = 0;
+    public static int lastRobot = 0;
 
     //keep track of the known neutralECs
     static Set<MapLocation> neutralECs = new HashSet<MapLocation>();
@@ -49,6 +49,7 @@ public strictfp class RobotPlayer {
         // This is the RobotController object. You use it to perform actions from this robot,
         // and to get information on its current status.
         RobotPlayer.rc = rc;
+
         turnCount = 0;
 
         //System.out.println("I'm a " + rc.getType() + " and I just got created!");
@@ -76,48 +77,54 @@ public strictfp class RobotPlayer {
         }
     }
 
-    static void runEnlightenmentCenter() throws GameActionException {
+    static RobotType makeRobots(int last, Direction d) throws GameActionException {
         RobotType toBuild1 = RobotType.POLITICIAN;
         RobotType toBuild2 = RobotType.SLANDERER;
         RobotType toBuild3 = RobotType.MUCKRAKER;
 
-        int votes;
         int influence = 50;
         int flagValue = 0;
-        runSlanderer();
+
+        if ((last == 0 || last == 3) && rc.canBuildRobot(toBuild1, d, influence)) {
+            rc.buildRobot(toBuild1, d, influence);
+            lastRobot = 1;
+            if (rc.canSetFlag(flagValue++) && Clock.getBytecodesLeft() > 0)
+            {
+                rc.setFlag(flagValue);
+            }
+            return toBuild1;
+        } else if ((last == 1) && rc.canBuildRobot(toBuild2, d, influence)) {
+            rc.buildRobot(toBuild2, d, influence);
+            lastRobot = 2;
+            if (rc.canSetFlag(flagValue++) && Clock.getBytecodesLeft() > 0)
+            {
+                rc.setFlag(flagValue);
+            }
+            return toBuild2;
+        } else if ((last == 2) && rc.canBuildRobot(toBuild3, d, influence)) {
+            rc.buildRobot(toBuild3, d, influence);
+            lastRobot = 3;
+            if (rc.canSetFlag(flagValue++) && Clock.getBytecodesLeft() > 0)
+            {
+                rc.setFlag(flagValue);
+            }
+            return toBuild3;
+        }
+        return null;
+    }
+
+    static void runEnlightenmentCenter() throws GameActionException {
+        int votes;
 
         votes = rc.getTeamVotes();
         for (Direction dir : directions) {
-            if ((lastRobot == 0 || lastRobot == 3) && rc.canBuildRobot(toBuild1, dir, influence)) {
-                rc.buildRobot(toBuild1, dir, influence);
-                lastRobot = 1;
-                if (rc.canSetFlag(flagValue++) && Clock.getBytecodesLeft() > 0)
-                {
-                    rc.setFlag(flagValue);
-                }
-            } else if ((lastRobot == 1) && rc.canBuildRobot(toBuild2, dir, influence)) {
-                rc.buildRobot(toBuild2, dir, influence);
-                lastRobot = 2;
-                if (rc.canSetFlag(flagValue++) && Clock.getBytecodesLeft() > 0)
-                {
-                    rc.setFlag(flagValue);
-                }
-            } else if ((lastRobot == 2) && rc.canBuildRobot(toBuild3, dir, influence)) {
-                rc.buildRobot(toBuild3, dir, influence);
-                lastRobot = 3;
-                if (rc.canSetFlag(flagValue++) && Clock.getBytecodesLeft() > 0)
-                {
-                    rc.setFlag(flagValue);
-                }
-            } else {
-                break;
-            }
+            makeRobots(lastRobot, dir);
         }
 
-        int leftoverInfluence = rc.getInfluence();
-        if (leftoverInfluence > 50)
+        int leftoverInf = rc.getInfluence();
+        if (leftoverInf > 50)
         {
-            int bid_num = leftoverInfluence - 50;
+            int bid_num = leftoverInf - 50;
             rc.bid(bid_num);
         }
         int byteCodeLeft = Clock.getBytecodesLeft();
@@ -201,7 +208,6 @@ public strictfp class RobotPlayer {
             tryMove(randomDirection());
             return -1;
         }
-
     }
 
     static void runMuckraker() throws GameActionException {

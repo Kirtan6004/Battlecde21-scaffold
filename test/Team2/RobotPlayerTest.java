@@ -71,20 +71,30 @@ public class RobotPlayerTest {
 
 	@Test
 	public void testRobotCreation() throws GameActionException {
-		rc = mock(RobotController.class);
-		if (lastRobot == 3)
-		{
-			assertEquals(RobotType.POLITICIAN, rc.getType());
+		testPlayer = mock(RobotPlayer.class);
+		testPlayer.rc = mock(RobotController.class);
+
+		if (testPlayer.rc.getInfluence() >= 50) {
+			testPlayer.runEnlightenmentCenter();
+			RobotType type0 = testPlayer.makeRobots(0, Direction.NORTHEAST);
+			assertEquals(RobotType.POLITICIAN, type0);
+			RobotType type1 = testPlayer.makeRobots(1, Direction.NORTHEAST);
+			assertEquals(RobotType.SLANDERER, type1);
+			RobotType type2 = testPlayer.makeRobots(2, Direction.NORTHEAST);
+			assertEquals(RobotType.MUCKRAKER, type2);
+			RobotType type3 = testPlayer.makeRobots(3, Direction.NORTHEAST);
+			assertEquals(RobotType.POLITICIAN, type3);
 		}
-		if (lastRobot == 1)
-		{
-			assertEquals(RobotType.SLANDERER, rc.getType());
-		}
-		if (lastRobot == 2)
-		{
-			assertEquals(RobotType.MUCKRAKER, rc.getType());
-		}
-	}
+		else {
+			testPlayer.runEnlightenmentCenter();
+			RobotType type0 = testPlayer.makeRobots(0, Direction.NORTHEAST);
+			assertEquals(null, type0);
+			RobotType type1 = testPlayer.makeRobots(1, Direction.NORTHEAST);
+			assertEquals(null, type1);
+			RobotType type2 = testPlayer.makeRobots(2, Direction.NORTHEAST);
+			assertEquals(null, type2);
+			RobotType type3 = testPlayer.makeRobots(3, Direction.NORTHEAST);
+			assertEquals(null, type3);
 
 	@Test
 	public void runTest() throws GameActionException {
