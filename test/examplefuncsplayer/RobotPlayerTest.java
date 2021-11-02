@@ -161,7 +161,7 @@ public class RobotPlayerTest {
 		response = testplayer.dealWithEnlightenmentCenters(neutEC);
 		assertEquals(1, response);
 	}
-	RobotController rc;
+	
 
 
 	@Test
@@ -230,4 +230,3 @@ public class RobotPlayerTest {
 		}
 	}
 
-}
