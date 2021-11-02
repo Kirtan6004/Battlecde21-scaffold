@@ -1,11 +1,11 @@
 package Team2;
 
 import static org.junit.Assert.*;
+import static org.mockito.Mockito.when;
 import static org.mockito.Mockito.mock;
 import static Team2.RobotPlayer.*;
 
-import battlecode.common.RobotController;
-import battlecode.common.RobotType;
+import battlecode.common.*;
 import org.junit.Rule;
 import org.junit.Test;
 import org.mockito.junit.MockitoRule;
@@ -16,6 +16,7 @@ public class RobotPlayerTest {
 	@Rule
 	public MockitoRule mockitoRule = MockitoJUnit.rule();
 
+	RobotPlayer testPlayer;
 	RobotController rc;
 
 	@Test
@@ -24,22 +25,38 @@ public class RobotPlayerTest {
 	}
 
 	@Test
-	public void testRobotCreation() {
-		rc = mock(RobotController.class);
-		if (lastRobot == 3) {
-			assertEquals(RobotType.POLITICIAN, rc.getType());
+	public void testRobotCreation() throws GameActionException {
+		testPlayer = mock(RobotPlayer.class);
+		testPlayer.rc = mock(RobotController.class);
+
+		if (testPlayer.rc.getInfluence() >= 50) {
+			testPlayer.runEnlightenmentCenter();
+			RobotType type0 = testPlayer.makeRobots(0, Direction.NORTHEAST);
+			assertEquals(RobotType.POLITICIAN, type0);
+			RobotType type1 = testPlayer.makeRobots(1, Direction.NORTHEAST);
+			assertEquals(RobotType.SLANDERER, type1);
+			RobotType type2 = testPlayer.makeRobots(2, Direction.NORTHEAST);
+			assertEquals(RobotType.MUCKRAKER, type2);
+			RobotType type3 = testPlayer.makeRobots(3, Direction.NORTHEAST);
+			assertEquals(RobotType.POLITICIAN, type3);
 		}
-		if (lastRobot == 1) {
-			assertEquals(RobotType.SLANDERER, rc.getType());
-		}
-		if (lastRobot == 2) {
-			assertEquals(RobotType.MUCKRAKER, rc.getType());
+		else {
+			testPlayer.runEnlightenmentCenter();
+			RobotType type0 = testPlayer.makeRobots(0, Direction.NORTHEAST);
+			assertEquals(null, type0);
+			RobotType type1 = testPlayer.makeRobots(1, Direction.NORTHEAST);
+			assertEquals(null, type1);
+			RobotType type2 = testPlayer.makeRobots(2, Direction.NORTHEAST);
+			assertEquals(null, type2);
+			RobotType type3 = testPlayer.makeRobots(3, Direction.NORTHEAST);
+			assertEquals(null, type3);
 		}
 	}
 
 	@Test
 	public void runTest() {
 		rc = mock(RobotController.class);
+		RobotType ec = RobotType.ENLIGHTENMENT_CENTER;
 		if (rc.getType() == RobotType.ENLIGHTENMENT_CENTER) {
 			assertEquals(RobotType.ENLIGHTENMENT_CENTER, rc.getType());
 		}
@@ -54,13 +71,13 @@ public class RobotPlayerTest {
 		}
 	}
 
-	@Test
-	public void testBid() {
-		rc = mock(RobotController.class);
-		if (infBeforeBid > 50) {
-			assertEquals(50, infAfterBid);
-		} else {
-			assertEquals(infBeforeBid, infAfterBid);
-		}
-	}
+//	@Test
+//	public void testBid() {
+//		rc = mock(RobotController.class);
+//		if (infBeforeBid > 50) {
+//			assertEquals(50, infAfterBid);
+//		} else {
+//			assertEquals(infBeforeBid, infAfterBid);
+//		}
+//	}
 }
