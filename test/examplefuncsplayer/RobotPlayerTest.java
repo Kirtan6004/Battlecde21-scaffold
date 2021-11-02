@@ -161,37 +161,19 @@ public class RobotPlayerTest {
 		response = testplayer.dealWithEnlightenmentCenters(neutEC);
 		assertEquals(1, response);
 	}
-	
 
 
-	@Test
-	public void createPoliticianRobot() throws GameActionException {
-		rc = mock(RobotController.class);
-		if(this.lastRobot.exists == true)
-		{
-			if (lastRobot == 3)
-			{
-				assertEquals(RobotType.POLITICIAN, rc.getType());
-			}
-			if (lastRobot == 1)
-			{
-				assertEquals(RobotType.SLANDERER, rc.getType());
-			}
-			if (lastRobot == 2)
-			{
-				assertEquals(RobotType.MUCKRAKER, rc.getType());
-			}
-		}
 
-	}
-		
+
+
 
 		@Test
 		public void politicianTest() throws GameActionException
 		{
 			rc = mock(RobotController.class);
-			int tempradius = -1;
-			Team team = Team.B;
+			int actionRadius = rc.getType().actionRadiusSquared;
+			Team enemyTeam = rc.getTeam().opponent();
+			Team allyTeam = rc.getTeam();
 			int ID = 1;
 			RobotType robottype = RobotType.POLITICIAN;
 			int influence = 111;
@@ -199,8 +181,8 @@ public class RobotPlayerTest {
 			MapLocation mapLocation = new MapLocation(0,0);
 			MapLocation enemylocation = new MapLocation(1,1);
 			RobotInfo[] enemies = new RobotInfo[1];
-			enemies[0] = new RobotInfo(ID, team, robottype, influence, conviction, enemylocation);
-			when(rc.senseNearbyRobots( tempradius, team)).thenReturn(enemies);
+			enemies[0] = new RobotInfo(ID, enemyTeam, robottype, influence, conviction, enemylocation);
+			when(rc.senseNearbyRobots( actionRadius, enemyTeam)).thenReturn(enemies);
 			MapLocation maplocation = rc.getLocation();
 			when(rc.getLocation()).thenReturn(new MapLocation(0, 0));
 			assertTrue(enemies.length > 0);
@@ -217,6 +199,26 @@ public class RobotPlayerTest {
 				assertFalse(r.getLocation().x < mapLocation.x);
 				newdangerX = dangerX+1;
 				assertEquals(1, dangerX+1);
+			}
+
+			if (turnCount <= 12) {
+				for (RobotInfo ally :rc.senseNearbyRobots(2, allyTeam)) {
+					if (ally.getType().canBid()){
+						homeID = ally.getID();
+						homeLoc = ally.getLocation();
+					}
+				}
+			} else if (turnCount > 800) {
+				directionality = Direction.CENTER;
+			}
+
+			if(turnCount >12 && turnCount <=800)
+			{
+				directionality = Direction.CENTER;
+				if(allyTeam.isPlayer())
+				{
+					return;
+				}
 			}
 		}
 	}
