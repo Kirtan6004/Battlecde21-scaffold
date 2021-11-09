@@ -131,42 +131,60 @@ public strictfp class RobotPlayer {
     }
 
     static void runPolitician() throws GameActionException {
-        Team enemyTeam = rc.getTeam().opponent();
-        Team allyTeam = rc.getTeam();
-
-
+        Team me = rc.getTeam();
+        Team enemy = rc.getTeam().opponent();
+        int sensorRadius = rc.getType().sensorRadiusSquared;
         int actionRadius = rc.getType().actionRadiusSquared;
-        RobotInfo[] attackable = rc.senseNearbyRobots(actionRadius, enemyTeam);
+        int backing = rc.senseNearbyRobots(actionRadius, me).length;
 
-        if (turnCount <= 12) {
-            for (RobotInfo ally :rc.senseNearbyRobots(2, allyTeam)) {
-                if (ally.getType().canBid()){
-                    homeID = ally.getID();
-                    homeLoc = ally.getLocation();
-                }
+        empower(actionRadius, rc.senseNearbyRobots(actionRadius,enemy),
+                rc.senseNearbyRobots(actionRadius, Team.NEUTRAL));
+        if(pursueNeutralECs() < 0)
+            tryMove(randomDirection());
+
+    }
+
+    static int empower(int actionRadius, RobotInfo[] enemy, RobotInfo[] neutral) throws GameActionException
+    {
+        if(rc.canEmpower(actionRadius)){
+            if(enemy.length > 0 || neutral.length > 0){
+                rc.empower(actionRadius);
+                System.out.println("BOOM!");
+                return 1;
             }
-        } else if (turnCount > 800) {
-            directionality = Direction.CENTER;
+            return 0;
         }
+        return -1;
 
-        // Can attack an enemy base or muckraker
-        for (RobotInfo enemy : attackable) {
-            if (enemy.type == RobotType.ENLIGHTENMENT_CENTER){
-                if (rc.canEmpower(actionRadius)){
-                    rc.empower(actionRadius);
-                    return;
-                }
+    }
+
+    /**
+     * @return -1 if no neutral ECs left, 1 if moving towards a neutral EC
+     * @throws GameActionException
+     */
+    static int pursueNeutralECs() throws GameActionException
+    {
+        if(neutralECs.size() == 0)
+            return -1;
+
+        Direction toClosest = Direction.CENTER;
+        MapLocation me = rc.getLocation();
+        int best = 999999;
+        int dist = 0;
+
+        for(MapLocation ml : neutralECs)
+        {
+            dist = me.distanceSquaredTo(ml);
+            if(dist < best)
+            {
+                best = dist;
+                toClosest = me.directionTo(ml);
             }
-        }
 
-        if (attackable.length != 3 && rc.canEmpower(actionRadius)) {
-            System.out.println("empowering...");
-            rc.empower(actionRadius);
-            System.out.println("empowered");
-            return;
         }
-        if (tryMove(randomDirection()))
-            System.out.println("I moved!");
+        System.out.println("I'm in pursuit!");
+        tryMove(toClosest);
+        return 1;
     }
 
     static void runSlanderer() throws GameActionException {
