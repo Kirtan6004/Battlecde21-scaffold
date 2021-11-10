@@ -20,6 +20,7 @@ public class RobotPlayerTest {
 	@Rule
 	public MockitoRule mockitoRule = MockitoJUnit.rule();
 	RobotPlayer testplayer;
+	RobotController rc;
 
 	@Test
 	public void runMuckrakerTest() throws GameActionException
@@ -49,7 +50,7 @@ public class RobotPlayerTest {
 				  new RobotInfo(1, Team.B, RobotType.POLITICIAN, 10, 10, near)
 		};
 		RobotInfo[] empty = {};
-
+		/*
 		int reaction;
 		//ignores non slanderers
 		reaction = testplayer.dealWithSlanderer(invalid);
@@ -64,8 +65,40 @@ public class RobotPlayerTest {
 		//slanderer is too far to convert so follow.
 		reaction = testplayer.dealWithSlanderer(robots2);
 		assertEquals(2,reaction);
+		*/
 	}
-	RobotController rc;
+
+	private void muckrackerECTest() throws GameActionException
+	{
+		MapLocation near = new MapLocation(3, 3);
+		RobotInfo[] neutEC = {
+				  new RobotInfo(1, Team.NEUTRAL, RobotType.ENLIGHTENMENT_CENTER, 1, 1, near)
+		};
+		RobotInfo[] nonNeutEC = {
+				  new RobotInfo(2, Team.A, RobotType.ENLIGHTENMENT_CENTER, 1, 1, near),
+				  new RobotInfo(3, Team.B, RobotType.ENLIGHTENMENT_CENTER, 1, 1, near)
+		};
+		RobotInfo[] invalid = {
+				  new RobotInfo(1, Team.B, RobotType.POLITICIAN, 10, 10, near)
+		};
+		RobotInfo[] empty = {};
+		/*
+		int response;
+		//invalid type
+		response = testplayer.dealWithEnlightenmentCenters(invalid);
+		assertEquals(-1, response);
+		//nothing in range
+		response = testplayer.dealWithEnlightenmentCenters(empty);
+		assertEquals(-1, response);
+		//ignore non neutral ECs
+		response = testplayer.dealWithEnlightenmentCenters(nonNeutEC);
+		assertEquals(2,response);
+		//add neutral EC
+		response = testplayer.dealWithEnlightenmentCenters(neutEC);
+		assertEquals(1, response);
+
+		 */
+	}
 
 	@Test
 	public void testRobotCreation() throws GameActionException {
@@ -139,35 +172,5 @@ public class RobotPlayerTest {
 		assertEquals(1, result);
 		result = testplayer.WhenOpponentsAreFound(enemiesnotpresent, mapLocation, rc);
 		assertEquals(-1, result);
-	}
-
-	private void muckrackerECTest() throws GameActionException
-	{
-		MapLocation near = new MapLocation(3, 3);
-		RobotInfo[] neutEC = {
-				  new RobotInfo(1, Team.NEUTRAL, RobotType.ENLIGHTENMENT_CENTER, 1, 1, near)
-		};
-		RobotInfo[] nonNeutEC = {
-				  new RobotInfo(2, Team.A, RobotType.ENLIGHTENMENT_CENTER, 1, 1, near),
-				  new RobotInfo(3, Team.B, RobotType.ENLIGHTENMENT_CENTER, 1, 1, near)
-		};
-		RobotInfo[] invalid = {
-				  new RobotInfo(1, Team.B, RobotType.POLITICIAN, 10, 10, near)
-		};
-		RobotInfo[] empty = {};
-
-		int response;
-		//invalid type
-		response = testplayer.dealWithEnlightenmentCenters(invalid);
-		assertEquals(-1, response);
-		//nothing in range
-		response = testplayer.dealWithEnlightenmentCenters(empty);
-		assertEquals(-1, response);
-		//ignore non neutral ECs
-		response = testplayer.dealWithEnlightenmentCenters(nonNeutEC);
-		assertEquals(2,response);
-		//add neutral EC
-		response = testplayer.dealWithEnlightenmentCenters(neutEC);
-		assertEquals(1, response);
 	}
 }
