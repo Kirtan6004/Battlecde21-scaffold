@@ -22,7 +22,7 @@ public class RobotPlayerTest {
 	@Rule
 	public MockitoRule mockitoRule = MockitoJUnit.rule();
 	RobotPlayer testplayer;
-	Slanderer testplayertemp;
+	Slanderer slnadererplayer;
 
 	@Test
 	public void runMuckrakerTest() throws GameActionException
@@ -124,7 +124,7 @@ public class RobotPlayerTest {
 	public void runSlanderer() throws GameActionException
 	{
 		testplayer = mock(RobotPlayer.class);
-		testplayertemp = mock(Slanderer.class);
+		slnadererplayer = mock(Slanderer.class);
 		rc = mock(RobotController.class);
 		int tempradius = -1;
 		Team teamA = Team.A;
@@ -140,10 +140,10 @@ public class RobotPlayerTest {
 		when(rc.senseNearbyRobots( tempradius, teamA)).thenReturn(enemiespresent);
 		when(rc.getLocation()).thenReturn(new MapLocation(0, 0));
 		//int result = testplayer.WhenOpponentsAreFound(enemiespresent, mapLocation, rc);
-		int result = testplayertemp.WhenOpponentsAreFound(enemiespresent, mapLocation, rc);
+		int result = slnadererplayer.WhenOpponentsAreFound(enemiespresent, mapLocation, rc);
 		assertEquals(1, result);
 		//result = testplayer.WhenOpponentsAreFound(enemiesnotpresent, mapLocation, rc);
-		result = testplayertemp.WhenOpponentsAreFound(enemiesnotpresent, mapLocation, rc);
+		result = slnadererplayer.WhenOpponentsAreFound(enemiesnotpresent, mapLocation, rc);
 		assertEquals(-1, result);
 	}
 
