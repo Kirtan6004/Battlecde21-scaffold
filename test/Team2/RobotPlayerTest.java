@@ -3,6 +3,8 @@ package Team2;
 import static Team2.RobotPlayer.*;
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
+
+import Team2.robots.Slanderer;
 import battlecode.common.*;
 import org.junit.Rule;
 import static org.mockito.Mockito.when;
@@ -20,6 +22,7 @@ public class RobotPlayerTest {
 	@Rule
 	public MockitoRule mockitoRule = MockitoJUnit.rule();
 	RobotPlayer testplayer;
+	Slanderer testplayertemp;
 
 	@Test
 	public void runMuckrakerTest() throws GameActionException
@@ -121,6 +124,7 @@ public class RobotPlayerTest {
 	public void runSlanderer() throws GameActionException
 	{
 		testplayer = mock(RobotPlayer.class);
+		testplayertemp = mock(Slanderer.class);
 		rc = mock(RobotController.class);
 		int tempradius = -1;
 		Team teamA = Team.A;
@@ -135,9 +139,11 @@ public class RobotPlayerTest {
 		enemiespresent[0] = new RobotInfo(ID, teamA, robottype, influence, conviction, enemylocation);
 		when(rc.senseNearbyRobots( tempradius, teamA)).thenReturn(enemiespresent);
 		when(rc.getLocation()).thenReturn(new MapLocation(0, 0));
-		int result = testplayer.WhenOpponentsAreFound(enemiespresent, mapLocation, rc);
+		//int result = testplayer.WhenOpponentsAreFound(enemiespresent, mapLocation, rc);
+		int result = testplayertemp.WhenOpponentsAreFound(enemiespresent, mapLocation, rc);
 		assertEquals(1, result);
-		result = testplayer.WhenOpponentsAreFound(enemiesnotpresent, mapLocation, rc);
+		//result = testplayer.WhenOpponentsAreFound(enemiesnotpresent, mapLocation, rc);
+		result = testplayertemp.WhenOpponentsAreFound(enemiesnotpresent, mapLocation, rc);
 		assertEquals(-1, result);
 	}
 
