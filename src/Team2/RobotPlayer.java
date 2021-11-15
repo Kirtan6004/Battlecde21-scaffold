@@ -1,5 +1,6 @@
 package Team2;
 import Team2.robots.Muckraker;
+import Team2.robots.Politician;
 import Team2.utils.ECManager;
 import battlecode.common.*;
 
@@ -54,11 +55,11 @@ public strictfp class RobotPlayer {
             // Try/catch blocks stop unhandled exceptions, which cause your robot to freeze
             try {
                 // Here, we've separated the controls into a different method for each RobotType.
-                //                // You may rewrite this into your own control structure if you wish.
+                // You may rewrite this into your own control structure if you wish.
                 //System.out.println("I'm a " + rc.getType() + "! Location " + rc.getLocation());
                 switch (rc.getType()) {
                     case ENLIGHTENMENT_CENTER: runEnlightenmentCenter(); break;
-                    case POLITICIAN:           runPolitician();          break;
+                    case POLITICIAN:           Politician.run(rc);       break;
                     case SLANDERER:            runSlanderer();           break;
                     case MUCKRAKER:            Muckraker.run(rc);        break;
                 }
@@ -124,63 +125,6 @@ public strictfp class RobotPlayer {
             rc.bid(bid_num);
         }
         int byteCodeLeft = Clock.getBytecodesLeft();
-    }
-
-    static void runPolitician() throws GameActionException {
-        Team me = rc.getTeam();
-        Team enemy = rc.getTeam().opponent();
-        int sensorRadius = rc.getType().sensorRadiusSquared;
-        int actionRadius = rc.getType().actionRadiusSquared;
-        int backing = rc.senseNearbyRobots(actionRadius, me).length;
-
-        empower(actionRadius, rc.senseNearbyRobots(actionRadius,enemy),
-                rc.senseNearbyRobots(actionRadius, Team.NEUTRAL));
-        if(pursueNeutralECs() < 0)
-            tryMove(randomDirection());
-
-    }
-
-    static int empower(int actionRadius, RobotInfo[] enemy, RobotInfo[] neutral) throws GameActionException
-    {
-        if(rc.canEmpower(actionRadius)){
-            if(enemy.length > 0 || neutral.length > 0){
-                rc.empower(actionRadius);
-                System.out.println("BOOM!");
-                return 1;
-            }
-            return 0;
-        }
-        return -1;
-
-    }
-
-    /**
-     * @return -1 if no neutral ECs left, 1 if moving towards a neutral EC
-     * @throws GameActionException
-     */
-    static int pursueNeutralECs() throws GameActionException
-    {
-        if(neutralECs.size() == 0)
-            return -1;
-
-        Direction toClosest = Direction.CENTER;
-        MapLocation me = rc.getLocation();
-        int best = 999999;
-        int dist = 0;
-
-        for(MapLocation ml : neutralECs)
-        {
-            dist = me.distanceSquaredTo(ml);
-            if(dist < best)
-            {
-                best = dist;
-                toClosest = me.directionTo(ml);
-            }
-
-        }
-        System.out.println("I'm in pursuit!");
-        tryMove(toClosest);
-        return 1;
     }
 
     static void runSlanderer() throws GameActionException {

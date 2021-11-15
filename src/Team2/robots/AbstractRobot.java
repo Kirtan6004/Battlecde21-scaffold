@@ -51,7 +51,10 @@ public abstract class AbstractRobot
 	{
 		return tryMove(rc.getLocation().directionTo(loc), rc);
 	}
-	
+	protected static boolean tryRandomMove(RobotController rc) throws GameActionException
+	{
+		return tryMove(randomDirection(), rc);
+	}
 	protected static boolean isEnemy(RobotInfo robot, RobotController rc)
 	{
 		return robot.team.equals(rc.getTeam().opponent());
