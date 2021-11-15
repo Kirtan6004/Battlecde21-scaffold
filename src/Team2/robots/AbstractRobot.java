@@ -1,13 +1,10 @@
 package Team2.robots;
 
-import battlecode.common.Direction;
-import battlecode.common.GameActionException;
-import battlecode.common.RobotController;
+import battlecode.common.*;
 
 
 public abstract class AbstractRobot
 {
-
 	protected static final Direction[] directions = {
 			  Direction.NORTH,
 			  Direction.NORTHEAST,
@@ -21,7 +18,19 @@ public abstract class AbstractRobot
 
 
 	//Copied these functions over here to use in your classes
+	protected static boolean chase(RobotInfo robot, RobotController rc) throws GameActionException
+	{
+		return tryMove(robot.location, rc);
+	}
 
+/**
+ * Attempts to move in a given direction.
+ *
+ * @param dir The intended direction of movement
+ * @param rc	The robot controller
+ * @return true if a move was performed
+ * @throws GameActionException
+ */
 	protected static boolean tryMove(Direction dir, RobotController rc) throws GameActionException
 	{
 
@@ -38,6 +47,16 @@ public abstract class AbstractRobot
 			} else return false;
 		}
 	}
+	protected static boolean tryMove(MapLocation loc, RobotController rc) throws GameActionException
+	{
+		return tryMove(rc.getLocation().directionTo(loc), rc);
+	}
+	
+	protected static boolean isEnemy(RobotInfo robot, RobotController rc)
+	{
+		return robot.team.equals(rc.getTeam().opponent());
+	}
+	
 	protected static Direction randomDirection() {
 		return directions[(int) (Math.random() * directions.length)];
 	}

@@ -1,5 +1,6 @@
 package Team2;
 import Team2.robots.Muckraker;
+import Team2.utils.ECManager;
 import battlecode.common.*;
 
 import java.util.*;
@@ -27,15 +28,10 @@ public strictfp class RobotPlayer {
 
     static int turnCount;
     // Add New Var on here
-    static MapLocation enemyBaseLoc = new MapLocation(0, 0);
-    static Direction directionality = Direction.CENTER;
 
     static Set<Integer> flagsSeen = new HashSet<Integer>();
 
     public static int lastRobot = 0;
-
-    //keep track of the known neutralECs
-    static Set<MapLocation> neutralECs = new HashSet<MapLocation>();
 
 
     /**
@@ -54,6 +50,7 @@ public strictfp class RobotPlayer {
         //System.out.println("I'm a " + rc.getType() + " and I just got created!");
         while (true) {
             turnCount += 1;
+            ECManager.updateLists(rc);
             // Try/catch blocks stop unhandled exceptions, which cause your robot to freeze
             try {
                 // Here, we've separated the controls into a different method for each RobotType.
@@ -266,14 +263,5 @@ public strictfp class RobotPlayer {
                 return true;
             } else return false;
         }
-    }
-
-
-    public static boolean addNeutralEC(MapLocation ml){
-        return neutralECs.add(ml);
-    }
-
-    public static void removeNeutralEC(MapLocation ml){
-        neutralECs.remove(ml);
     }
 }
