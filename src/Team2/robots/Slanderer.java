@@ -5,6 +5,9 @@ import battlecode.common.*;
 
 public class Slanderer extends AbstractRobot{
 
+    public static int dangerX = 0;
+    public static int dangerY = 0;
+
     public static void runSlanderer(RobotController rc) throws GameActionException {
 
         RobotInfo[] enemies = rc.senseNearbyRobots(-1,rc.getTeam().opponent());
@@ -15,9 +18,6 @@ public class Slanderer extends AbstractRobot{
 
     public static int WhenOpponentsAreFound(RobotInfo[] enemies, MapLocation location, RobotController rctemp) throws GameActionException
     {
-        //rc = rctemp;
-        int dangerX = 0;
-        int dangerY = 0;
         if (enemies.length > 0)
         {
             for(RobotInfo r : enemies)
@@ -25,15 +25,8 @@ public class Slanderer extends AbstractRobot{
                 if(r.getType() == RobotType.MUCKRAKER){
                     //FLY YOU FOOLS!
                     MapLocation enemyloc = r.getLocation();
-                    if(enemyloc.x > location.x)
-                        dangerX--;
-                    else
-                        dangerX++;
-
-                    if(enemyloc.y > location.y)
-                        dangerY--;
-                    else
-                        dangerY++;
+                    dangerX = ChangeXCoordinates(enemyloc, location);
+                    dangerY = ChangeYCoordinates(enemyloc, location);
                 }
             }
             MapLocation safety = location.translate(Integer.signum(dangerX),
@@ -46,5 +39,33 @@ public class Slanderer extends AbstractRobot{
             tryMove(randomDirection(), rctemp);
             return -1;
         }
+    }
+
+    public static int ChangeXCoordinates(MapLocation enemyloc, MapLocation location)
+    {
+
+        if(enemyloc.x > location.x)
+        {
+            dangerX--;
+        }
+        else
+        {
+            dangerX++;
+        }
+        return dangerX;
+    }
+
+    public static int ChangeYCoordinates(MapLocation enemyloc, MapLocation location)
+    {
+
+        if (enemyloc.y > location.y)
+        {
+            dangerY--;
+        }
+        else
+        {
+            dangerY++;
+        }
+        return dangerY;
     }
 }

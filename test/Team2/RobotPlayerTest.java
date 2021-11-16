@@ -22,7 +22,7 @@ public class RobotPlayerTest {
 	@Rule
 	public MockitoRule mockitoRule = MockitoJUnit.rule();
 	RobotPlayer testplayer;
-	Slanderer slnadererplayer;
+	Slanderer slandererplayer;
 
 	@Test
 	public void runMuckrakerTest() throws GameActionException
@@ -124,7 +124,7 @@ public class RobotPlayerTest {
 	public void runSlanderer() throws GameActionException
 	{
 		testplayer = mock(RobotPlayer.class);
-		slnadererplayer = mock(Slanderer.class);
+		slandererplayer = mock(Slanderer.class);
 		rc = mock(RobotController.class);
 		int tempradius = -1;
 		Team teamA = Team.A;
@@ -139,13 +139,43 @@ public class RobotPlayerTest {
 		enemiespresent[0] = new RobotInfo(ID, teamA, robottype, influence, conviction, enemylocation);
 		when(rc.senseNearbyRobots( tempradius, teamA)).thenReturn(enemiespresent);
 		when(rc.getLocation()).thenReturn(new MapLocation(0, 0));
-		//int result = testplayer.WhenOpponentsAreFound(enemiespresent, mapLocation, rc);
-		int result = slnadererplayer.WhenOpponentsAreFound(enemiespresent, mapLocation, rc);
+		int dangerX = ChangeXCoordinates(enemylocation, mapLocation);
+		assertEquals(1, dangerX);
+		int dangerY = ChangeYCoordinates(enemylocation, mapLocation);
+		int result = slandererplayer.WhenOpponentsAreFound(enemiespresent, mapLocation, rc);
+		assertEquals(1, dangerY);
 		assertEquals(1, result);
-		//result = testplayer.WhenOpponentsAreFound(enemiesnotpresent, mapLocation, rc);
-		result = slnadererplayer.WhenOpponentsAreFound(enemiesnotpresent, mapLocation, rc);
+		result = slandererplayer.WhenOpponentsAreFound(enemiesnotpresent, mapLocation, rc);
 		assertEquals(-1, result);
 	}
+	private int ChangeXCoordinates(MapLocation enemyloc, MapLocation location)
+	{
+		int dangerX = 0;
+		if(enemyloc.x > location.x)
+		{
+			dangerX--;
+		}
+		else
+		{
+			dangerX++;
+		}
+		return 1;
+	}
+	private int ChangeYCoordinates(MapLocation enemyloc, MapLocation location)
+	{
+		int dangerY = 0;
+		if (enemyloc.y > location.y)
+		{
+			dangerY--;
+		}
+		else
+		{
+			dangerY++;
+		}
+		return 1;
+	}
+
+
 
 	private void muckrackerECTest() throws GameActionException
 	{

@@ -231,6 +231,8 @@ public strictfp class RobotPlayer {
         return retVal;
     }
 
+
+
     /**
      * Returns a random Direction.
      *
