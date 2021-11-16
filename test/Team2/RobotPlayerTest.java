@@ -1,16 +1,5 @@
 package Team2;
 
-<<<<<<< HEAD
-import static Team2.RobotPlayer.turnCount;
-import static org.mockito.Mockito.*;
-
-import battlecode.common.*;
-import junit.framework.TestCase;
-import org.junit.Rule;
-import org.junit.Test;
-import org.mockito.junit.MockitoJUnit;
-import org.mockito.junit.MockitoRule;
-=======
 import static Team2.RobotPlayer.*;
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
@@ -23,40 +12,14 @@ import org.mockito.junit.MockitoRule;
 import battlecode.common.GameActionException;
 import battlecode.common.RobotController;
 import battlecode.common.RobotType;
->>>>>>> timothy
 
 
-public class RobotPlayerTest extends TestCase {
-	@Rule
-	public MockitoRule mockitoRule = MockitoJUnit.rule();
+public class RobotPlayerTest {
 
-<<<<<<< HEAD
-	RobotPlayer testplayer;
-	RobotController rc;
-	@Test
-	public void testSanity() {assertEquals(2, 1+1);}
-
-	@org.junit.jupiter.api.Test
-	public void runPoliticianTest() throws GameActionException{
-		rc = mock(RobotController.class);
-		testplayer.rc = mock(RobotController.class);
-		when(testplayer.rc.getType()).thenReturn(RobotType.POLITICIAN);
-		when(testplayer.rc.getTeam()).thenReturn(Team.A);
-		when(testplayer.rc.getLocation()).thenReturn(new MapLocation(0,0));
-
-
-		RobotInfo[] robots = {
-				new RobotInfo(2, Team.B, RobotType.POLITICIAN,1,1, new MapLocation(1, 1))
-		};
-		//This Part is testing the number logic of Politician
-//
-
-=======
 
 	@Rule
 	public MockitoRule mockitoRule = MockitoJUnit.rule();
 	RobotPlayer testplayer;
-	RobotController rc;
 
 	@Test
 	public void runMuckrakerTest() throws GameActionException
@@ -86,7 +49,7 @@ public class RobotPlayerTest extends TestCase {
 				  new RobotInfo(1, Team.B, RobotType.POLITICIAN, 10, 10, near)
 		};
 		RobotInfo[] empty = {};
-		/*
+
 		int reaction;
 		//ignores non slanderers
 		reaction = testplayer.dealWithSlanderer(invalid);
@@ -101,40 +64,8 @@ public class RobotPlayerTest extends TestCase {
 		//slanderer is too far to convert so follow.
 		reaction = testplayer.dealWithSlanderer(robots2);
 		assertEquals(2,reaction);
-		*/
 	}
-
-	private void muckrackerECTest() throws GameActionException
-	{
-		MapLocation near = new MapLocation(3, 3);
-		RobotInfo[] neutEC = {
-				  new RobotInfo(1, Team.NEUTRAL, RobotType.ENLIGHTENMENT_CENTER, 1, 1, near)
-		};
-		RobotInfo[] nonNeutEC = {
-				  new RobotInfo(2, Team.A, RobotType.ENLIGHTENMENT_CENTER, 1, 1, near),
-				  new RobotInfo(3, Team.B, RobotType.ENLIGHTENMENT_CENTER, 1, 1, near)
-		};
-		RobotInfo[] invalid = {
-				  new RobotInfo(1, Team.B, RobotType.POLITICIAN, 10, 10, near)
-		};
-		RobotInfo[] empty = {};
-		/*
-		int response;
-		//invalid type
-		response = testplayer.dealWithEnlightenmentCenters(invalid);
-		assertEquals(-1, response);
-		//nothing in range
-		response = testplayer.dealWithEnlightenmentCenters(empty);
-		assertEquals(-1, response);
-		//ignore non neutral ECs
-		response = testplayer.dealWithEnlightenmentCenters(nonNeutEC);
-		assertEquals(2,response);
-		//add neutral EC
-		response = testplayer.dealWithEnlightenmentCenters(neutEC);
-		assertEquals(1, response);
-
-		 */
-	}
+	RobotController rc;
 
 	@Test
 	public void testRobotCreation() throws GameActionException {
@@ -208,6 +139,93 @@ public class RobotPlayerTest extends TestCase {
 		assertEquals(1, result);
 		result = testplayer.WhenOpponentsAreFound(enemiesnotpresent, mapLocation, rc);
 		assertEquals(-1, result);
->>>>>>> timothy
 	}
+
+	private void muckrackerECTest() throws GameActionException
+	{
+		MapLocation near = new MapLocation(3, 3);
+		RobotInfo[] neutEC = {
+				  new RobotInfo(1, Team.NEUTRAL, RobotType.ENLIGHTENMENT_CENTER, 1, 1, near)
+		};
+		RobotInfo[] nonNeutEC = {
+				  new RobotInfo(2, Team.A, RobotType.ENLIGHTENMENT_CENTER, 1, 1, near),
+				  new RobotInfo(3, Team.B, RobotType.ENLIGHTENMENT_CENTER, 1, 1, near)
+		};
+		RobotInfo[] invalid = {
+				  new RobotInfo(1, Team.B, RobotType.POLITICIAN, 10, 10, near)
+		};
+		RobotInfo[] empty = {};
+
+		int response;
+		//invalid type
+		response = testplayer.dealWithEnlightenmentCenters(invalid);
+		assertEquals(-1, response);
+		//nothing in range
+		response = testplayer.dealWithEnlightenmentCenters(empty);
+		assertEquals(-1, response);
+		//ignore non neutral ECs
+		response = testplayer.dealWithEnlightenmentCenters(nonNeutEC);
+		assertEquals(2,response);
+		//add neutral EC
+		response = testplayer.dealWithEnlightenmentCenters(neutEC);
+		assertEquals(1, response);
+	}
+	
+	
+	@Test
+		public void politicianTest() throws GameActionException
+		{
+			testplayer = mock(RobotPlayer.class);
+			testplayer.rc = mock(RobotController.class);
+			when(testplayer.rc.getType()).thenReturn(RobotType.POLITICIAN);
+			when(testplayer.rc.getTeam()).thenReturn(Team.A);
+			when(testplayer.rc.getLocation()).thenReturn(new MapLocation(0,0));
+
+			rc = mock(RobotController.class);
+			Team teamB = Team.B;
+			int ID = 1;
+			int tempradius = -1;
+			RobotType robottype = RobotType.POLITICIAN;
+			int influence = 111;
+			int conviction = 80;
+			MapLocation mapLocation = new MapLocation(0,0);
+			MapLocation enemylocation = new MapLocation(1,1);
+			RobotInfo[] enemies = new RobotInfo[1];
+			enemies[0] = new RobotInfo(ID, teamB, robottype, influence, conviction, enemylocation);
+			when(rc.senseNearbyRobots( tempradius, teamB)).thenReturn(enemies);
+			MapLocation maplocation = rc.getLocation();
+			when(rc.getLocation()).thenReturn(new MapLocation(0, 0));
+			assertTrue(enemies.length > 0);
+			int dangerX = 0;
+			int dangerY = 0;
+			for (RobotInfo r : enemies)
+			{
+				assertTrue(r.getType() == RobotType.POLITICIAN);
+				int temp = 0;
+				assertEquals(r.getLocation(), enemylocation);
+				assertTrue(r.getLocation().x > mapLocation.x);
+				int newdangerX = dangerX-1;
+				assertEquals(-1, dangerX-1);
+				assertFalse(r.getLocation().x < mapLocation.x);
+				newdangerX = dangerX+1;
+				assertEquals(1, dangerX+1);
+			}
+
+			if (turnCount <= 12) {
+					directionality = Direction.EAST;
+				}
+			 else if (turnCount > 800) {
+				directionality = Direction.WEST;
+			}
+
+			if(turnCount >12 && turnCount <=800)
+			{
+				directionality = Direction.CENTER;
+				if(teamB.isPlayer())
+				{
+					return;
+				}
+			}
+		
+	
 }
