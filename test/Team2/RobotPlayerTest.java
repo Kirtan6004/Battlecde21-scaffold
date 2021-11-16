@@ -241,22 +241,5 @@ public class RobotPlayerTest {
 				newdangerX = dangerX+1;
 				assertEquals(1, dangerX+1);
 			}
-
-			if (turnCount <= 12) {
-					directionality = Direction.EAST;
-				}
-			 else if (turnCount > 800) {
-				directionality = Direction.WEST;
-			}
-
-			if(turnCount >12 && turnCount <=800)
-			{
-				directionality = Direction.CENTER;
-				if(teamB.isPlayer())
-				{
-					return;
-				}
-			}
-		
 		}
 }
