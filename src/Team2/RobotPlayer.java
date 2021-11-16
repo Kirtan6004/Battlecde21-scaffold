@@ -1,6 +1,7 @@
 package Team2;
 import Team2.robots.Muckraker;
 import Team2.robots.Politician;
+import Team2.robots.Slanderer;
 import battlecode.common.*;
 
 import java.util.*;
@@ -58,7 +59,7 @@ public strictfp class RobotPlayer {
                 switch (rc.getType()) {
                     case ENLIGHTENMENT_CENTER: runEnlightenmentCenter(); break;
                     case POLITICIAN:           Politician.run(rc);       break;
-                    case SLANDERER:            runSlanderer();           break;
+                    case SLANDERER:            Slanderer.runSlanderer(rc);runSlanderer();           break;
                     case MUCKRAKER:            Muckraker.run(rc);        break;
                 }
 

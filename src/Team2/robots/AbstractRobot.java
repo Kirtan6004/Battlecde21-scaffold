@@ -8,8 +8,10 @@ import battlecode.common.*;
 
 
 
+
 public abstract class AbstractRobot
 {
+
     protected static final Direction[] directions = {
             Direction.NORTH,
             Direction.NORTHEAST,
@@ -20,6 +22,32 @@ public abstract class AbstractRobot
             Direction.WEST,
             Direction.NORTHWEST,
     };
+
+
+    //Copied these functions over here to use in your classes
+
+    protected static boolean tryMove(Direction dir, RobotController rc) throws GameActionException
+    {
+
+        if (rc == null)
+        {
+            return false;
+        }
+        else
+        {
+            //System.out.println("I am trying to move " + dir + "; " + rc.isReady() + " " + rc.getCooldownTurns() + " " + rc.canMove(dir));
+            if (rc.canMove(dir)) {
+                rc.move(dir);
+                return true;
+            } else return false;
+        }
+    }
+    protected static Direction randomDirection() {
+        return directions[(int) (Math.random() * directions.length)];
+    }
+
+
+
 
 	//Copied these functions over here to use in your classes
 	protected static boolean chase(RobotInfo robot, RobotController rc) throws GameActionException
@@ -35,22 +63,7 @@ public abstract class AbstractRobot
  * @return true if a move was performed
  * @throws GameActionException
  */
-	protected static boolean tryMove(Direction dir, RobotController rc) throws GameActionException
-	{
 
-		if (rc == null)
-		{
-			return false;
-		}
-		else
-		{
-			//System.out.println("I am trying to move " + dir + "; " + rc.isReady() + " " + rc.getCooldownTurns() + " " + rc.canMove(dir));
-			if (rc.canMove(dir)) {
-				rc.move(dir);
-				return true;
-			} else return false;
-		}
-	}
 	protected static boolean tryMove(MapLocation loc, RobotController rc) throws GameActionException
 	{
 		return tryMove(rc.getLocation().directionTo(loc), rc);
@@ -64,7 +77,5 @@ public abstract class AbstractRobot
 		return robot.team.equals(rc.getTeam().opponent());
 	}
 	
-	protected static Direction randomDirection() {
-		return directions[(int) (Math.random() * directions.length)];
-	}
+
 }
