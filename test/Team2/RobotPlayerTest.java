@@ -1,8 +1,9 @@
 package Team2;
 
-import static Team2.RobotPlayer.*;
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
+
+import Team2.robots.Muckraker;
 import battlecode.common.*;
 import org.junit.Rule;
 import static org.mockito.Mockito.when;
@@ -21,6 +22,7 @@ public class RobotPlayerTest {
 	public MockitoRule mockitoRule = MockitoJUnit.rule();
 	RobotPlayer testplayer;
 	RobotController rc;
+	Muckraker muckraker;
 
 	@Test
 	public void runMuckrakerTest() throws GameActionException
@@ -50,22 +52,25 @@ public class RobotPlayerTest {
 				  new RobotInfo(1, Team.B, RobotType.POLITICIAN, 10, 10, near)
 		};
 		RobotInfo[] empty = {};
-		/*
+
 		int reaction;
 		//ignores non slanderers
-		reaction = testplayer.dealWithSlanderer(invalid);
-		assertEquals(-1, reaction);
+		reaction = muckraker.dealWithSlanderer(invalid, testplayer.rc);
+		assertEquals(-2, reaction);
 		//nothing in range
-		reaction = testplayer.dealWithSlanderer(empty);
+		reaction = muckraker.dealWithSlanderer(empty, testplayer.rc);
 		assertEquals(-1, reaction);
 		//slanderer is close enough to convert
 		when(testplayer.rc.canExpose(near)).thenReturn(true);
-		reaction = testplayer.dealWithSlanderer(robots);
+		reaction = muckraker.dealWithSlanderer(robots, testplayer.rc);
 		assertEquals(1,reaction);
+		//Muckracker doesn't have enough energy to convert
+		doThrow(new GameActionException(GameActionExceptionType.NOT_ENOUGH_RESOURCE, "")).when(testplayer.rc).expose(near);
+		reaction = muckraker.dealWithSlanderer(robots, testplayer.rc);
+		assertEquals(-1, reaction);
 		//slanderer is too far to convert so follow.
-		reaction = testplayer.dealWithSlanderer(robots2);
-		assertEquals(2,reaction);
-		*/
+		reaction = muckraker.dealWithSlanderer(robots2, testplayer.rc);
+		assertEquals(-2,reaction);
 	}
 
 	private void muckrackerECTest() throws GameActionException
@@ -82,8 +87,9 @@ public class RobotPlayerTest {
 				  new RobotInfo(1, Team.B, RobotType.POLITICIAN, 10, 10, near)
 		};
 		RobotInfo[] empty = {};
-		/*
+
 		int response;
+		/**
 		//invalid type
 		response = testplayer.dealWithEnlightenmentCenters(invalid);
 		assertEquals(-1, response);
@@ -96,8 +102,9 @@ public class RobotPlayerTest {
 		//add neutral EC
 		response = testplayer.dealWithEnlightenmentCenters(neutEC);
 		assertEquals(1, response);
-
 		 */
+		response = muckraker.dealWithEnlightenmentCenters(neutEC, testplayer.rc);
+		assertEquals(-1, response);
 	}
 
 	@Test
