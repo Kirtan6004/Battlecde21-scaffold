@@ -203,37 +203,6 @@ public class RobotPlayerTest {
 		assertEquals(-1, result);
 	}
 
-	private void muckrackerECTest() throws GameActionException
-	{
-		MapLocation near = new MapLocation(3, 3);
-		RobotInfo[] neutEC = {
-				  new RobotInfo(1, Team.NEUTRAL, RobotType.ENLIGHTENMENT_CENTER, 1, 1, near)
-		};
-		RobotInfo[] nonNeutEC = {
-				  new RobotInfo(2, Team.A, RobotType.ENLIGHTENMENT_CENTER, 1, 1, near),
-				  new RobotInfo(3, Team.B, RobotType.ENLIGHTENMENT_CENTER, 1, 1, near)
-		};
-		RobotInfo[] invalid = {
-				  new RobotInfo(1, Team.B, RobotType.POLITICIAN, 10, 10, near)
-		};
-		RobotInfo[] empty = {};
-
-		int response;
-		//invalid type
-		response = testplayer.dealWithEnlightenmentCenters(invalid);
-		assertEquals(-1, response);
-		//nothing in range
-		response = testplayer.dealWithEnlightenmentCenters(empty);
-		assertEquals(-1, response);
-		//ignore non neutral ECs
-		response = testplayer.dealWithEnlightenmentCenters(nonNeutEC);
-		assertEquals(2,response);
-		//add neutral EC
-		response = testplayer.dealWithEnlightenmentCenters(neutEC);
-		assertEquals(1, response);
-	}
-	
-	
 	@Test
 		public void politicianTest() throws GameActionException
 		{

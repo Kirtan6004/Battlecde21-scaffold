@@ -13,7 +13,7 @@ public class Muckraker extends AbstractRobot
 		dealWithSlanderer(robots, rc);
 		dealWithEnlightenmentCenters(robots, rc);
 		//Move randomly if it can't see anything
-		tryMove(randomDirection(), rc);
+		tryRandomMove(rc);
 	}
 
 	public static int dealWithSlanderer(RobotInfo[] robots, RobotController rc) throws GameActionException
