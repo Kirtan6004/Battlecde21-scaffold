@@ -187,52 +187,6 @@ public class RobotPlayerTest {
 	}
 
 	@Test
-	public void testPolCreationRP() throws GameActionException {
-		testplayer = mock(RobotPlayer.class);
-		testplayer.rc = mock(RobotController.class);
-		//RobotInfo ri = mock(RobotInfo.class);
-		MapLocation mapLocation = new MapLocation(2,2);
-		RobotInfo ec = new RobotInfo(1, Team.A, RobotType.ENLIGHTENMENT_CENTER,200, 100, mapLocation);
-		assertEquals(200, ec.getInfluence());
-		testplayer.rc.buildRobot(RobotType.ENLIGHTENMENT_CENTER, Direction.NORTHEAST, 200);
-		RobotType ret = testplayer.makePol(3, Direction.NORTHEAST);
-		if (testplayer.rc.getInfluence() >= 100) {
-			assertEquals(RobotType.POLITICIAN, ret);
-		}
-		else {
-			assertNull(ret);
-		}
-	}
-
-	@Test
-	public void testSlandCreationRP() throws GameActionException {
-		testplayer = mock(RobotPlayer.class);
-		testplayer.rc = mock(RobotController.class);
-		RobotType ret = testplayer.makeSlan(3, Direction.NORTHEAST);
-		if (testplayer.rc.getInfluence() >= 100) {
-			assertEquals(RobotType.SLANDERER, ret);
-		}
-		else {
-			assertNull(ret);
-		}
-	}
-
-	@Test
-	public void testMuckCreationRP() throws GameActionException {
-		testplayer = mock(RobotPlayer.class);
-		testplayer.rc = mock(RobotController.class);
-		RobotType ret = testplayer.makeMuck(3, Direction.NORTHEAST);
-		if (testplayer.rc.getInfluence() >= 100) {
-			assertEquals(RobotType.MUCKRAKER, ret);
-		}
-		else {
-			assertNull(ret);
-		}
-	}
-
-
-
-	@Test
 	public void runSlanderer() throws GameActionException
 	{
 		testplayer = mock(RobotPlayer.class);
