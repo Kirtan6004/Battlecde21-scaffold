@@ -1,4 +1,5 @@
 package Team2;
+import Team2.robots.EnlightenmentCenter;
 import Team2.robots.Muckraker;
 import Team2.robots.Politician;
 import Team2.robots.Slanderer;
@@ -57,7 +58,7 @@ public strictfp class RobotPlayer {
                 // You may rewrite this into your own control structure if you wish.
                 //System.out.println("I'm a " + rc.getType() + "! Location " + rc.getLocation());
                 switch (rc.getType()) {
-                    case ENLIGHTENMENT_CENTER: runEnlightenmentCenter(); break;
+                    case ENLIGHTENMENT_CENTER: EnlightenmentCenter.run(rc); break;
                     case POLITICIAN:           Politician.run(rc);       break;
                     case SLANDERER:            Slanderer.runSlanderer(rc);break;
                     case MUCKRAKER:            Muckraker.run(rc);        break;
@@ -71,77 +72,6 @@ public strictfp class RobotPlayer {
                 e.printStackTrace();
             }
         }
-    }
-
-    static RobotType makeFlag(int flagValue, Direction d, RobotType r, int lastR) throws GameActionException {
-        rc.buildRobot(r, d, influence);
-        if (lastR == 3)
-        {
-            lastRobot = 0;
-        }
-        else {
-            lastRobot++;
-        }
-        if (rc.canSetFlag(flagValue++) && Clock.getBytecodesLeft() > 0)
-        {
-            rc.setFlag(flagValue);
-        }
-        return r;
-    }
-
-    static RobotType makePol(int last, Direction d) throws GameActionException {
-        if (rc.canBuildRobot(RobotType.POLITICIAN, d, influence)) {
-            return makeFlag(0, d, RobotType.POLITICIAN, last);
-        }
-        return null;
-    }
-
-    static RobotType makeSlan(int last, Direction d) throws GameActionException {
-        if (rc.canBuildRobot(RobotType.SLANDERER, d, influence)) {
-            return makeFlag(0, d, RobotType.SLANDERER, last);
-        }
-        return null;
-    }
-
-    static RobotType makeMuck(int last, Direction d) throws GameActionException {
-        if (rc.canBuildRobot(RobotType.MUCKRAKER, d, influence)) {
-            return makeFlag(0, d, RobotType.MUCKRAKER, last);
-        }
-        return null;
-    }
-
-    static RobotType makeRobots(int last, Direction d) throws GameActionException {
-        if (last == 1) {
-            return makeSlan(last, d);
-        } else if (last == 2) {
-            return makeMuck(last, d);
-        }
-        else {
-            return makePol(last, d);
-        }
-    }
-
-    static void runEnlightenmentCenter() throws GameActionException {
-        int votes;
-
-        votes = rc.getTeamVotes();
-        for (Direction dir : directions) {
-            makeRobots(lastRobot, dir);
-        }
-
-        int leftoverInf = rc.getInfluence();
-        if (leftoverInf > 100)
-        {
-            int bid_num = leftoverInf - 100;
-            rc.bid(bid_num);
-        }
-        int byteCodeLeft = Clock.getBytecodesLeft();
-    }
-
-    static void runSlanderer() throws GameActionException {
-        RobotInfo[] enemies = rc.senseNearbyRobots(-1,rc.getTeam().opponent());
-        MapLocation location = rc.getLocation();
-        int result = WhenOpponentsAreFound(enemies, location, rc);
     }
 
     static int WhenOpponentsAreFound(RobotInfo[] enemies, MapLocation location, RobotController rctemp) throws GameActionException
