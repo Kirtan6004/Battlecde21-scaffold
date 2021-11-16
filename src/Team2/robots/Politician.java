@@ -9,7 +9,7 @@ public class Politician extends AbstractRobot
   {
     Team enemy = rc.getTeam().opponent();
     int actionRadius = rc.getType().actionRadiusSquared;
-    
+
     canattackanenemy(rc, actionRadius,enemy);
     empower(rc, actionRadius, rc.senseNearbyRobots(actionRadius,enemy),
           rc.senseNearbyRobots(actionRadius, Team.NEUTRAL));
