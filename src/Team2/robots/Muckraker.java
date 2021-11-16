@@ -13,23 +13,25 @@ public class Muckraker extends AbstractRobot
 		dealWithSlanderer(robots, rc);
 		dealWithEnlightenmentCenters(robots, rc);
 		//Move randomly if it can't see anything
-		tryMove(randomDirection(), rc);
+		tryRandomMove(rc);
 	}
 
-	static int dealWithSlanderer(RobotInfo[] robots, RobotController rc) throws GameActionException
+	public static int dealWithSlanderer(RobotInfo[] robots, RobotController rc) throws GameActionException
 	{
 		int retVal = -1;
+		int result;
 		for (RobotInfo r : robots)
 		{
-			if(canExposeSlanderer(r,rc))
+			result = canExposeSlanderer(r, rc);
+			if(result == 1)
 				retVal = expose(r, rc);
 			else
-				retVal = chaseSlanderer(r, rc, retVal);
+				retVal = chaseSlanderer(r, rc, result);
 		}
 		return retVal;
 	}
 
-	static int dealWithEnlightenmentCenters(RobotInfo[] robots, RobotController rc)
+	public static int dealWithEnlightenmentCenters(RobotInfo[] robots, RobotController rc)
 	{
 		int retVal = -1;
 		/*
@@ -51,7 +53,7 @@ public class Muckraker extends AbstractRobot
 	static int chaseSlanderer(RobotInfo robot, RobotController rc, int retval) throws GameActionException
 	{
 		chase(robot, rc);
-		return (retval == 1) ? 1 : 2;
+		return (retval == 1) ? 1 : retval;
 	}
 	
 	/** Exposes robot, returns 1*/
@@ -67,14 +69,15 @@ public class Muckraker extends AbstractRobot
 		}
 	}
 	
-	static boolean canExposeSlanderer(RobotInfo robot, RobotController rc) throws GameActionException
+	static int canExposeSlanderer(RobotInfo robot, RobotController rc) throws GameActionException
 	{
-		if(isEnemy(robot, rc) && exposable(robot, rc))
+		if(isEnemy(robot, rc))
 		{
-			rc.expose(robot.location);
-			return true;
+			if(exposable(robot, rc))
+				return 1;
+			return -2;
 		}
-		return false;
+		return -1;
 	}
 	
 	/** Returns true if the robot type is exposable and the muckracker can expose them*/
