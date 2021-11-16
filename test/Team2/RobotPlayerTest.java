@@ -112,7 +112,7 @@ public class RobotPlayerTest {
 		testplayer = mock(RobotPlayer.class);
 		testplayer.rc = mock(RobotController.class);
 
-		if (testplayer.rc.getInfluence() >= 50) {
+		if (testplayer.rc.getInfluence() >= 100) {
 			testplayer.runEnlightenmentCenter();
 			RobotType type0 = testplayer.makeRobots(0, Direction.NORTHEAST);
 			assertEquals(RobotType.POLITICIAN, type0);
@@ -125,37 +125,59 @@ public class RobotPlayerTest {
 		} else {
 			testplayer.runEnlightenmentCenter();
 			RobotType type0 = testplayer.makeRobots(0, Direction.NORTHEAST);
-			assertEquals(null, type0);
+			assertNull(type0);
 			RobotType type1 = testplayer.makeRobots(1, Direction.NORTHEAST);
-			assertEquals(null, type1);
+			assertNull(type1);
 			RobotType type2 = testplayer.makeRobots(2, Direction.NORTHEAST);
-			assertEquals(null, type2);
+			assertNull(type2);
 			RobotType type3 = testplayer.makeRobots(3, Direction.NORTHEAST);
-			assertEquals(null, type3);
+			assertNull(type3);
 		}
 	}
 
 	@Test
-	public void runTest() throws GameActionException {
-		rc = mock(RobotController.class);
-		if (rc.getType() == RobotType.ENLIGHTENMENT_CENTER)
-		{
-			assertEquals(RobotType.ENLIGHTENMENT_CENTER, rc.getType());
+	public void testPolCreation() throws GameActionException {
+		testplayer = mock(RobotPlayer.class);
+		testplayer.rc = mock(RobotController.class);
+		//RobotInfo ri = mock(RobotInfo.class);
+		MapLocation mapLocation = new MapLocation(2,2);
+		RobotInfo ec = new RobotInfo(1, Team.A, RobotType.ENLIGHTENMENT_CENTER,200, 100, mapLocation);
+		assertEquals(200, ec.getInfluence());
+		testplayer.rc.buildRobot(RobotType.ENLIGHTENMENT_CENTER, Direction.NORTHEAST, 200);
+		RobotType ret = testplayer.makePol(3, Direction.NORTHEAST);
+		if (testplayer.rc.getInfluence() >= 100) {
+			assertEquals(RobotType.POLITICIAN, ret);
 		}
-		if (rc.getType() == RobotType.POLITICIAN)
-		{
-			assertEquals(RobotType.POLITICIAN, rc.getType());
-		}
-		if (rc.getType() == RobotType.SLANDERER)
-		{
-			assertEquals(RobotType.SLANDERER, rc.getType());
-		}
-		if (rc.getType() == RobotType.MUCKRAKER) {
-			assertEquals(RobotType.MUCKRAKER, rc.getType());
+		else {
+			assertNull(ret);
 		}
 	}
 
+	@Test
+	public void testSlandCreation() throws GameActionException {
+		testplayer = mock(RobotPlayer.class);
+		testplayer.rc = mock(RobotController.class);
+		RobotType ret = testplayer.makeSlan(3, Direction.NORTHEAST);
+		if (testplayer.rc.getInfluence() >= 100) {
+			assertEquals(RobotType.SLANDERER, ret);
+		}
+		else {
+			assertNull(ret);
+		}
+	}
 
+	@Test
+	public void testMuckCreation() throws GameActionException {
+		testplayer = mock(RobotPlayer.class);
+		testplayer.rc = mock(RobotController.class);
+		RobotType ret = testplayer.makeMuck(3, Direction.NORTHEAST);
+		if (testplayer.rc.getInfluence() >= 100) {
+			assertEquals(RobotType.MUCKRAKER, ret);
+		}
+		else {
+			assertNull(ret);
+		}
+	}
 
 	@Test
 	public void runSlanderer() throws GameActionException
@@ -180,4 +202,92 @@ public class RobotPlayerTest {
 		result = testplayer.WhenOpponentsAreFound(enemiesnotpresent, mapLocation, rc);
 		assertEquals(-1, result);
 	}
+
+	private void muckrackerECTest() throws GameActionException
+	{
+		MapLocation near = new MapLocation(3, 3);
+		RobotInfo[] neutEC = {
+				  new RobotInfo(1, Team.NEUTRAL, RobotType.ENLIGHTENMENT_CENTER, 1, 1, near)
+		};
+		RobotInfo[] nonNeutEC = {
+				  new RobotInfo(2, Team.A, RobotType.ENLIGHTENMENT_CENTER, 1, 1, near),
+				  new RobotInfo(3, Team.B, RobotType.ENLIGHTENMENT_CENTER, 1, 1, near)
+		};
+		RobotInfo[] invalid = {
+				  new RobotInfo(1, Team.B, RobotType.POLITICIAN, 10, 10, near)
+		};
+		RobotInfo[] empty = {};
+
+		int response;
+		//invalid type
+		response = testplayer.dealWithEnlightenmentCenters(invalid);
+		assertEquals(-1, response);
+		//nothing in range
+		response = testplayer.dealWithEnlightenmentCenters(empty);
+		assertEquals(-1, response);
+		//ignore non neutral ECs
+		response = testplayer.dealWithEnlightenmentCenters(nonNeutEC);
+		assertEquals(2,response);
+		//add neutral EC
+		response = testplayer.dealWithEnlightenmentCenters(neutEC);
+		assertEquals(1, response);
+	}
+	
+	
+	@Test
+		public void politicianTest() throws GameActionException
+		{
+			testplayer = mock(RobotPlayer.class);
+			testplayer.rc = mock(RobotController.class);
+			when(testplayer.rc.getType()).thenReturn(RobotType.POLITICIAN);
+			when(testplayer.rc.getTeam()).thenReturn(Team.A);
+			when(testplayer.rc.getLocation()).thenReturn(new MapLocation(0,0));
+
+			rc = mock(RobotController.class);
+			Team teamB = Team.B;
+			int ID = 1;
+			int tempradius = -1;
+			RobotType robottype = RobotType.POLITICIAN;
+			int influence = 111;
+			int conviction = 80;
+			MapLocation mapLocation = new MapLocation(0,0);
+			MapLocation enemylocation = new MapLocation(1,1);
+			RobotInfo[] enemies = new RobotInfo[1];
+			enemies[0] = new RobotInfo(ID, teamB, robottype, influence, conviction, enemylocation);
+			when(rc.senseNearbyRobots( tempradius, teamB)).thenReturn(enemies);
+			MapLocation maplocation = rc.getLocation();
+			when(rc.getLocation()).thenReturn(new MapLocation(0, 0));
+			assertTrue(enemies.length > 0);
+			int dangerX = 0;
+			int dangerY = 0;
+			for (RobotInfo r : enemies)
+			{
+				assertTrue(r.getType() == RobotType.POLITICIAN);
+				int temp = 0;
+				assertEquals(r.getLocation(), enemylocation);
+				assertTrue(r.getLocation().x > mapLocation.x);
+				int newdangerX = dangerX-1;
+				assertEquals(-1, dangerX-1);
+				assertFalse(r.getLocation().x < mapLocation.x);
+				newdangerX = dangerX+1;
+				assertEquals(1, dangerX+1);
+			}
+
+			if (turnCount <= 12) {
+					directionality = Direction.EAST;
+				}
+			 else if (turnCount > 800) {
+				directionality = Direction.WEST;
+			}
+
+			if(turnCount >12 && turnCount <=800)
+			{
+				directionality = Direction.CENTER;
+				if(teamB.isPlayer())
+				{
+					return;
+				}
+			}
+		
+		}
 }
