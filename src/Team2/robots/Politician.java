@@ -45,8 +45,6 @@ public class Politician extends AbstractRobot
       System.out.println("Moving");
     else
       System.out.println("Something wrong with movement");
-
-
     return 1;
      */
     return -1;
@@ -54,10 +52,15 @@ public class Politician extends AbstractRobot
 
   static int empower(RobotController rc, int actionRadius, RobotInfo[] enemy, RobotInfo[] neutral) throws GameActionException
   {
+//    if (attackable.length != 3 && rc.canEmpower(actionRadius)) {
+//      System.out.println("empowering...");
+//      rc.empower(actionRadius);
+//      System.out.println("empowered");
+//      return;
+//    }
     if(rc.canEmpower(actionRadius)){
       if(enemy.length > 0 || neutral.length > 0){
         rc.empower(actionRadius);
-        //System.out.println("BOOM!");
         return 1;
       }
       return 0;
