@@ -59,7 +59,7 @@ public strictfp class RobotPlayer {
                 switch (rc.getType()) {
                     case ENLIGHTENMENT_CENTER: runEnlightenmentCenter(); break;
                     case POLITICIAN:           Politician.run(rc);       break;
-                    case SLANDERER:            Slanderer.runSlanderer(rc);runSlanderer();           break;
+                    case SLANDERER:            Slanderer.runSlanderer(rc);break;
                     case MUCKRAKER:            Muckraker.run(rc);        break;
                 }
 
