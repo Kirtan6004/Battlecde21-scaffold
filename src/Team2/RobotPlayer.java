@@ -1,4 +1,6 @@
 package Team2;
+import Team2.robots.Muckraker;
+import Team2.robots.Politician;
 import battlecode.common.*;
 
 import java.util.*;
@@ -27,18 +29,10 @@ public strictfp class RobotPlayer {
     static int turnCount;
     static int influence = 100;
     // Add New Var on here
-    static MapLocation enemyBaseLoc = new MapLocation(0, 0);
-    static int homeID;
-    static MapLocation homeLoc;
-    static Direction directionality = Direction.CENTER;
 
     static Set<Integer> flagsSeen = new HashSet<Integer>();
 
     public static int lastRobot = 0;
-
-    //keep track of the known neutralECs
-    static Set<MapLocation> neutralECs = new HashSet<MapLocation>();
-
 
     /**
      * run() is the method that is called when a robot is instantiated in the Battlecode world.
@@ -59,13 +53,13 @@ public strictfp class RobotPlayer {
             // Try/catch blocks stop unhandled exceptions, which cause your robot to freeze
             try {
                 // Here, we've separated the controls into a different method for each RobotType.
-                //                // You may rewrite this into your own control structure if you wish.
+                // You may rewrite this into your own control structure if you wish.
                 //System.out.println("I'm a " + rc.getType() + "! Location " + rc.getLocation());
                 switch (rc.getType()) {
                     case ENLIGHTENMENT_CENTER: runEnlightenmentCenter(); break;
-                    case POLITICIAN:           runPolitician();          break;
+                    case POLITICIAN:           Politician.run(rc);       break;
                     case SLANDERER:            runSlanderer();           break;
-                    case MUCKRAKER:            runMuckraker();           break;
+                    case MUCKRAKER:            Muckraker.run(rc);        break;
                 }
 
                 // Clock.yield() makes the robot wait until the next turn, then it will perform this loop again
@@ -143,45 +137,6 @@ public strictfp class RobotPlayer {
         int byteCodeLeft = Clock.getBytecodesLeft();
     }
 
-    static void runPolitician() throws GameActionException {
-        Team enemyTeam = rc.getTeam().opponent();
-        Team allyTeam = rc.getTeam();
-
-
-        int actionRadius = rc.getType().actionRadiusSquared;
-        RobotInfo[] attackable = rc.senseNearbyRobots(actionRadius, enemyTeam);
-
-        if (turnCount <= 12) {
-            for (RobotInfo ally :rc.senseNearbyRobots(2, allyTeam)) {
-                if (ally.getType().canBid()){
-                    homeID = ally.getID();
-                    homeLoc = ally.getLocation();
-                }
-            }
-        } else if (turnCount > 800) {
-            directionality = Direction.CENTER;
-        }
-
-        // Can attack an enemy base or muckraker
-        for (RobotInfo enemy : attackable) {
-            if (enemy.type == RobotType.ENLIGHTENMENT_CENTER){
-                if (rc.canEmpower(actionRadius)){
-                    rc.empower(actionRadius);
-                    return;
-                }
-            }
-        }
-
-        if (attackable.length != 3 && rc.canEmpower(actionRadius)) {
-            System.out.println("empowering...");
-            rc.empower(actionRadius);
-            System.out.println("empowered");
-            return;
-        }
-        if (tryMove(randomDirection()))
-            System.out.println("I moved!");
-    }
-
     static void runSlanderer() throws GameActionException {
         RobotInfo[] enemies = rc.senseNearbyRobots(-1,rc.getTeam().opponent());
         MapLocation location = rc.getLocation();
@@ -223,63 +178,6 @@ public strictfp class RobotPlayer {
         }
     }
 
-    static void runMuckraker() throws GameActionException {
-        Team enemy = rc.getTeam().opponent();
-        int detectRadius = rc.getType().detectionRadiusSquared;
-        RobotInfo[] robots = rc.senseNearbyRobots(detectRadius);
-            if(dealWithSlanderer(robots) != -1)
-                return;
-            else
-                dealWithEnlightenmentCenters(robots);
-        //Move randomly if it can't see anything
-        tryMove(randomDirection());
-    }
-    static int dealWithSlanderer(RobotInfo[] robots) throws GameActionException
-    {
-        int retVal = -1;
-        for(RobotInfo r : robots){
-            if(!r.type.equals(RobotType.SLANDERER))
-                continue;
-            Team enemy = rc.getTeam().opponent();
-            //expose it if its in range
-            if(r.team.equals(enemy)){
-                if (r.type.canBeExposed())
-                {
-                    if (rc.canExpose(r.location))
-                    {
-                        rc.expose(r.location);
-                        //System.out.println("Exposed you!");
-                        retVal = 1;
-                    }
-                }
-                //otherwise chase slanderer
-                tryMove(rc.getLocation().directionTo(r.getLocation()));
-                retVal = (retVal == 1) ? 1 : 2;
-            }
-        }
-        return retVal;
-    }
-
-    static int dealWithEnlightenmentCenters(RobotInfo[] robots)
-    {
-        int retVal = -1;
-        for(RobotInfo r : robots)
-        {
-            if (!r.type.equals(RobotType.ENLIGHTENMENT_CENTER))
-                continue;
-            if (r.team.equals(Team.NEUTRAL))
-            {
-                if (addNeutralEC(r.location))
-                {
-                    //System.out.println("I'm Helping! " + neutralECs.size());
-                    retVal = 1;
-                }
-            }
-            retVal = (retVal == 1) ? 1 : 2;
-        }
-        return retVal;
-    }
-
     /**
      * Returns a random Direction.
      *
@@ -319,14 +217,5 @@ public strictfp class RobotPlayer {
                 return true;
             } else return false;
         }
-    }
-
-
-    static boolean addNeutralEC(MapLocation ml){
-        return neutralECs.add(ml);
-    }
-
-    static void removeNeutralEC(MapLocation ml){
-        neutralECs.remove(ml);
     }
 }

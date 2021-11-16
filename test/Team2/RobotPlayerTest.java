@@ -193,4 +193,62 @@ public class RobotPlayerTest {
 		response = testplayer.dealWithEnlightenmentCenters(neutEC);
 		assertEquals(1, response);
 	}
+	
+	
+	@Test
+		public void politicianTest() throws GameActionException
+		{
+			testplayer = mock(RobotPlayer.class);
+			testplayer.rc = mock(RobotController.class);
+			when(testplayer.rc.getType()).thenReturn(RobotType.POLITICIAN);
+			when(testplayer.rc.getTeam()).thenReturn(Team.A);
+			when(testplayer.rc.getLocation()).thenReturn(new MapLocation(0,0));
+
+			rc = mock(RobotController.class);
+			Team teamB = Team.B;
+			int ID = 1;
+			int tempradius = -1;
+			RobotType robottype = RobotType.POLITICIAN;
+			int influence = 111;
+			int conviction = 80;
+			MapLocation mapLocation = new MapLocation(0,0);
+			MapLocation enemylocation = new MapLocation(1,1);
+			RobotInfo[] enemies = new RobotInfo[1];
+			enemies[0] = new RobotInfo(ID, teamB, robottype, influence, conviction, enemylocation);
+			when(rc.senseNearbyRobots( tempradius, teamB)).thenReturn(enemies);
+			MapLocation maplocation = rc.getLocation();
+			when(rc.getLocation()).thenReturn(new MapLocation(0, 0));
+			assertTrue(enemies.length > 0);
+			int dangerX = 0;
+			int dangerY = 0;
+			for (RobotInfo r : enemies)
+			{
+				assertTrue(r.getType() == RobotType.POLITICIAN);
+				int temp = 0;
+				assertEquals(r.getLocation(), enemylocation);
+				assertTrue(r.getLocation().x > mapLocation.x);
+				int newdangerX = dangerX-1;
+				assertEquals(-1, dangerX-1);
+				assertFalse(r.getLocation().x < mapLocation.x);
+				newdangerX = dangerX+1;
+				assertEquals(1, dangerX+1);
+			}
+
+			if (turnCount <= 12) {
+					directionality = Direction.EAST;
+				}
+			 else if (turnCount > 800) {
+				directionality = Direction.WEST;
+			}
+
+			if(turnCount >12 && turnCount <=800)
+			{
+				directionality = Direction.CENTER;
+				if(teamB.isPlayer())
+				{
+					return;
+				}
+			}
+		
+	
 }
