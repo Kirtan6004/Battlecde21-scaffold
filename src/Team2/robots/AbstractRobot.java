@@ -1,17 +1,15 @@
 package Team2.robots;
 
-<<<<<<< HEAD
 import battlecode.common.Direction;
 import battlecode.common.GameActionException;
 import battlecode.common.RobotController;
-=======
+
 import battlecode.common.*;
->>>>>>> timothy
+
 
 
 public abstract class AbstractRobot
 {
-<<<<<<< HEAD
 
     protected static final Direction[] directions = {
             Direction.NORTH,
@@ -47,7 +45,7 @@ public abstract class AbstractRobot
         return directions[(int) (Math.random() * directions.length)];
     }
 }
-=======
+
 	protected static final Direction[] directions = {
 			  Direction.NORTH,
 			  Direction.NORTHEAST,
@@ -107,4 +105,3 @@ public abstract class AbstractRobot
 		return directions[(int) (Math.random() * directions.length)];
 	}
 }
->>>>>>> timothy
