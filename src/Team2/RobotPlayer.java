@@ -1,7 +1,6 @@
 package Team2;
 import Team2.robots.Muckraker;
 import Team2.robots.Politician;
-import Team2.utils.ECManager;
 import battlecode.common.*;
 
 import java.util.*;
@@ -34,7 +33,6 @@ public strictfp class RobotPlayer {
 
     public static int lastRobot = 0;
 
-
     /**
      * run() is the method that is called when a robot is instantiated in the Battlecode world.
      * If this method returns, the robot dies!
@@ -51,7 +49,6 @@ public strictfp class RobotPlayer {
         //System.out.println("I'm a " + rc.getType() + " and I just got created!");
         while (true) {
             turnCount += 1;
-            ECManager.updateLists(rc);
             // Try/catch blocks stop unhandled exceptions, which cause your robot to freeze
             try {
                 // Here, we've separated the controls into a different method for each RobotType.

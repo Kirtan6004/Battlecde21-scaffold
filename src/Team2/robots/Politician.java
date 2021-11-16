@@ -1,5 +1,6 @@
 package Team2.robots;
 
+import Team2.RobotPlayer;
 import battlecode.common.*;
 
 public class Politician extends AbstractRobot
@@ -9,9 +10,9 @@ public class Politician extends AbstractRobot
     Team enemy = rc.getTeam().opponent();
     int actionRadius = rc.getType().actionRadiusSquared;
   
-    empower(actionRadius, rc.senseNearbyRobots(actionRadius,enemy),
+    empower(rc, actionRadius, rc.senseNearbyRobots(actionRadius,enemy),
           rc.senseNearbyRobots(actionRadius, Team.NEUTRAL));
-    if(pursueNeutralECs() < 0)
+    if(pursueNeutralECs(rc) < 0)
       tryRandomMove(rc);
   }
 
@@ -21,40 +22,46 @@ public class Politician extends AbstractRobot
    */
   static int pursueNeutralECs(RobotController rc) throws GameActionException
   {
-    if(neutralECs.size() == 0)
+    /*
+    if(!ecm().haveKnownNeutralECs())
       return -1;
-    
+    System.out.println("WE made it past the first check");
     Direction toClosest = Direction.CENTER;
     MapLocation me = rc.getLocation();
     int best = 999999;
     int dist = 0;
     
-    for(MapLocation ml : neutralECs)
+    for(RobotInfo robot : ecm().getNeutralECs())
     {
-      dist = me.distanceSquaredTo(ml);
+      dist = me.distanceSquaredTo(robot.location);
       if(dist < best)
       {
         best = dist;
-        toClosest = me.directionTo(ml);
+        toClosest = me.directionTo(robot.location);
       }
-      
     }
-    System.out.println("I'm in pursuit!");
-    tryMove(toClosest);
+    //System.out.println("I'm in pursuit!");
+    if(tryMove(toClosest, rc))
+      System.out.println("Moving");
+    else
+      System.out.println("Something wrong with movement");
+
+
     return 1;
+     */
+    return -1;
   }
 
-  static int empower(int actionRadius, RobotInfo[] enemy, RobotInfo[] neutral) throws GameActionException
+  static int empower(RobotController rc, int actionRadius, RobotInfo[] enemy, RobotInfo[] neutral) throws GameActionException
   {
     if(rc.canEmpower(actionRadius)){
       if(enemy.length > 0 || neutral.length > 0){
         rc.empower(actionRadius);
-        System.out.println("BOOM!");
+        //System.out.println("BOOM!");
         return 1;
       }
       return 0;
     }
     return -1;
-    
   }
 }

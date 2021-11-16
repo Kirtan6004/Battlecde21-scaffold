@@ -1,6 +1,5 @@
 package Team2.robots;
 
-import Team2.utils.ECManager;
 import battlecode.common.*;
 
 
@@ -9,13 +8,10 @@ public class Muckraker extends AbstractRobot
 
 	public static void run(RobotController rc) throws GameActionException
 	{
-		Team enemy = rc.getTeam().opponent();
 		int detectRadius = rc.getType().detectionRadiusSquared;
 		RobotInfo[] robots = rc.senseNearbyRobots(detectRadius);
-		if (dealWithSlanderer(robots, rc) != -1)
-			return;
-		else
-			dealWithEnlightenmentCenters(robots, rc);
+		dealWithSlanderer(robots, rc);
+		dealWithEnlightenmentCenters(robots, rc);
 		//Move randomly if it can't see anything
 		tryMove(randomDirection(), rc);
 	}
@@ -36,12 +32,18 @@ public class Muckraker extends AbstractRobot
 	static int dealWithEnlightenmentCenters(RobotInfo[] robots, RobotController rc)
 	{
 		int retVal = -1;
+		/*
 		for (RobotInfo r : robots)
 		{
-			if(ECManager.addEc(r,rc))
+			if(ecm().addEc(r,rc))
+			{
 				retVal = 1;
+			}
 			else retVal = (retVal == 1) ? 1 : 2;
 		}
+		return retVal;
+
+		*/
 		return retVal;
 	}
 	
@@ -53,10 +55,16 @@ public class Muckraker extends AbstractRobot
 	}
 	
 	/** Exposes robot, returns 1*/
-	static int expose(RobotInfo robot, RobotController rc) throws GameActionException
+	static int expose(RobotInfo robot, RobotController rc)
 	{
-		rc.expose(robot.location);
-		return 1;
+		try
+		{
+			rc.expose(robot.location);
+			return 1;
+		} catch (GameActionException e)
+		{
+			return -1;
+		}
 	}
 	
 	static boolean canExposeSlanderer(RobotInfo robot, RobotController rc) throws GameActionException
@@ -71,7 +79,7 @@ public class Muckraker extends AbstractRobot
 	
 	/** Returns true if the robot type is exposable and the muckracker can expose them*/
 	static boolean exposable(RobotInfo robot, RobotController rc)
-{
-	return robot.type.canBeExposed() && rc.canExpose(robot.location);
-}
+	{
+		return robot.type.canBeExposed() && rc.canExpose(robot.location);
+	}
 }
