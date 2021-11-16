@@ -6,7 +6,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 
-public class EC extends AbstractRobot {
+public class EnlightenmentCenter extends AbstractRobot {
   static int turnCount;
   static int influence = 100;
   public static int lastRobot = 0;
