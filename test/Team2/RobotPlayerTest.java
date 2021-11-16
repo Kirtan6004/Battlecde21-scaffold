@@ -65,58 +65,80 @@ public class RobotPlayerTest {
 		reaction = testplayer.dealWithSlanderer(robots2);
 		assertEquals(2,reaction);
 	}
-	RobotController rc;
-	RobotPlayer testplayer;
 
+	RobotController rc;
 
 	@Test
 	public void testRobotCreation() throws GameActionException {
-		testPlayer = mock(RobotPlayer.class);
-		testPlayer.rc = mock(RobotController.class);
+		testplayer = mock(RobotPlayer.class);
+		testplayer.rc = mock(RobotController.class);
 
-		if (testPlayer.rc.getInfluence() >= 50) {
-			testPlayer.runEnlightenmentCenter();
-			RobotType type0 = testPlayer.makeRobots(0, Direction.NORTHEAST);
+		if (testplayer.rc.getInfluence() >= 100) {
+			testplayer.runEnlightenmentCenter();
+			RobotType type0 = testplayer.makeRobots(0, Direction.NORTHEAST);
 			assertEquals(RobotType.POLITICIAN, type0);
-			RobotType type1 = testPlayer.makeRobots(1, Direction.NORTHEAST);
+			RobotType type1 = testplayer.makeRobots(1, Direction.NORTHEAST);
 			assertEquals(RobotType.SLANDERER, type1);
-			RobotType type2 = testPlayer.makeRobots(2, Direction.NORTHEAST);
+			RobotType type2 = testplayer.makeRobots(2, Direction.NORTHEAST);
 			assertEquals(RobotType.MUCKRAKER, type2);
-			RobotType type3 = testPlayer.makeRobots(3, Direction.NORTHEAST);
+			RobotType type3 = testplayer.makeRobots(3, Direction.NORTHEAST);
 			assertEquals(RobotType.POLITICIAN, type3);
-		}
-		else {
-			testPlayer.runEnlightenmentCenter();
-			RobotType type0 = testPlayer.makeRobots(0, Direction.NORTHEAST);
-			assertEquals(null, type0);
-			RobotType type1 = testPlayer.makeRobots(1, Direction.NORTHEAST);
-			assertEquals(null, type1);
-			RobotType type2 = testPlayer.makeRobots(2, Direction.NORTHEAST);
-			assertEquals(null, type2);
-			RobotType type3 = testPlayer.makeRobots(3, Direction.NORTHEAST);
-			assertEquals(null, type3);
-
-	@Test
-	public void runTest() throws GameActionException {
-		rc = mock(RobotController.class);
-		if (rc.getType() == RobotType.ENLIGHTENMENT_CENTER)
-		{
-			assertEquals(RobotType.ENLIGHTENMENT_CENTER, rc.getType());
-		}
-		if (rc.getType() == RobotType.POLITICIAN)
-		{
-			assertEquals(RobotType.POLITICIAN, rc.getType());
-		}
-		if (rc.getType() == RobotType.SLANDERER)
-		{
-			assertEquals(RobotType.SLANDERER, rc.getType());
-		}
-		if (rc.getType() == RobotType.MUCKRAKER) {
-			assertEquals(RobotType.MUCKRAKER, rc.getType());
+		} else {
+			testplayer.runEnlightenmentCenter();
+			RobotType type0 = testplayer.makeRobots(0, Direction.NORTHEAST);
+			assertNull(type0);
+			RobotType type1 = testplayer.makeRobots(1, Direction.NORTHEAST);
+			assertNull(type1);
+			RobotType type2 = testplayer.makeRobots(2, Direction.NORTHEAST);
+			assertNull(type2);
+			RobotType type3 = testplayer.makeRobots(3, Direction.NORTHEAST);
+			assertNull(type3);
 		}
 	}
 
+	@Test
+	public void testPolCreation() throws GameActionException {
+		testplayer = mock(RobotPlayer.class);
+		testplayer.rc = mock(RobotController.class);
+		//RobotInfo ri = mock(RobotInfo.class);
+		MapLocation mapLocation = new MapLocation(2,2);
+		RobotInfo ec = new RobotInfo(1, Team.A, RobotType.ENLIGHTENMENT_CENTER,200, 100, mapLocation);
+		assertEquals(200, ec.getInfluence());
+		testplayer.rc.buildRobot(RobotType.ENLIGHTENMENT_CENTER, Direction.NORTHEAST, 200);
+		RobotType ret = testplayer.makePol(3, Direction.NORTHEAST);
+		if (testplayer.rc.getInfluence() >= 100) {
+			assertEquals(RobotType.POLITICIAN, ret);
+		}
+		else {
+			assertNull(ret);
+		}
+	}
 
+	@Test
+	public void testSlandCreation() throws GameActionException {
+		testplayer = mock(RobotPlayer.class);
+		testplayer.rc = mock(RobotController.class);
+		RobotType ret = testplayer.makeSlan(3, Direction.NORTHEAST);
+		if (testplayer.rc.getInfluence() >= 100) {
+			assertEquals(RobotType.SLANDERER, ret);
+		}
+		else {
+			assertNull(ret);
+		}
+	}
+
+	@Test
+	public void testMuckCreation() throws GameActionException {
+		testplayer = mock(RobotPlayer.class);
+		testplayer.rc = mock(RobotController.class);
+		RobotType ret = testplayer.makeMuck(3, Direction.NORTHEAST);
+		if (testplayer.rc.getInfluence() >= 100) {
+			assertEquals(RobotType.MUCKRAKER, ret);
+		}
+		else {
+			assertNull(ret);
+		}
+	}
 
 	@Test
 	public void runSlanderer() throws GameActionException

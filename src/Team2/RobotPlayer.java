@@ -25,6 +25,7 @@ public strictfp class RobotPlayer {
     };
 
     static int turnCount;
+    static int influence = 100;
     // Add New Var on here
     static MapLocation enemyBaseLoc = new MapLocation(0, 0);
     static int homeID;
@@ -69,7 +70,7 @@ public strictfp class RobotPlayer {
 
                 // Clock.yield() makes the robot wait until the next turn, then it will perform this loop again
                 Clock.yield();
- 
+
             } catch (Exception e) {
                 System.out.println(rc.getType() + " Exception");
                 e.printStackTrace();
@@ -77,40 +78,52 @@ public strictfp class RobotPlayer {
         }
     }
 
-    static RobotType makeRobots(int last, Direction d) throws GameActionException {
-        RobotType toBuild1 = RobotType.POLITICIAN;
-        RobotType toBuild2 = RobotType.SLANDERER;
-        RobotType toBuild3 = RobotType.MUCKRAKER;
+    static RobotType makeFlag(int flagValue, Direction d, RobotType r, int lastR) throws GameActionException {
+        rc.buildRobot(r, d, influence);
+        if (lastR == 3)
+        {
+            lastRobot = 0;
+        }
+        else {
+            lastRobot++;
+        }
+        if (rc.canSetFlag(flagValue++) && Clock.getBytecodesLeft() > 0)
+        {
+            rc.setFlag(flagValue);
+        }
+        return r;
+    }
 
-        int influence = 50;
-        int flagValue = 0;
-
-        if ((last == 0 || last == 3) && rc.canBuildRobot(toBuild1, d, influence)) {
-            rc.buildRobot(toBuild1, d, influence);
-            lastRobot = 1;
-            if (rc.canSetFlag(flagValue++) && Clock.getBytecodesLeft() > 0)
-            {
-                rc.setFlag(flagValue);
-            }
-            return toBuild1;
-        } else if ((last == 1) && rc.canBuildRobot(toBuild2, d, influence)) {
-            rc.buildRobot(toBuild2, d, influence);
-            lastRobot = 2;
-            if (rc.canSetFlag(flagValue++) && Clock.getBytecodesLeft() > 0)
-            {
-                rc.setFlag(flagValue);
-            }
-            return toBuild2;
-        } else if ((last == 2) && rc.canBuildRobot(toBuild3, d, influence)) {
-            rc.buildRobot(toBuild3, d, influence);
-            lastRobot = 3;
-            if (rc.canSetFlag(flagValue++) && Clock.getBytecodesLeft() > 0)
-            {
-                rc.setFlag(flagValue);
-            }
-            return toBuild3;
+    static RobotType makePol(int last, Direction d) throws GameActionException {
+        if (rc.canBuildRobot(RobotType.POLITICIAN, d, influence)) {
+            return makeFlag(0, d, RobotType.POLITICIAN, last);
         }
         return null;
+    }
+
+    static RobotType makeSlan(int last, Direction d) throws GameActionException {
+        if (rc.canBuildRobot(RobotType.SLANDERER, d, influence)) {
+            return makeFlag(0, d, RobotType.SLANDERER, last);
+        }
+        return null;
+    }
+
+    static RobotType makeMuck(int last, Direction d) throws GameActionException {
+        if (rc.canBuildRobot(RobotType.MUCKRAKER, d, influence)) {
+            return makeFlag(0, d, RobotType.MUCKRAKER, last);
+        }
+        return null;
+    }
+
+    static RobotType makeRobots(int last, Direction d) throws GameActionException {
+        if (last == 1) {
+            return makeSlan(last, d);
+        } else if (last == 2) {
+            return makeMuck(last, d);
+        }
+        else {
+            return makePol(last, d);
+        }
     }
 
     static void runEnlightenmentCenter() throws GameActionException {
@@ -122,9 +135,9 @@ public strictfp class RobotPlayer {
         }
 
         int leftoverInf = rc.getInfluence();
-        if (leftoverInf > 50)
+        if (leftoverInf > 100)
         {
-            int bid_num = leftoverInf - 50;
+            int bid_num = leftoverInf - 100;
             rc.bid(bid_num);
         }
         int byteCodeLeft = Clock.getBytecodesLeft();
