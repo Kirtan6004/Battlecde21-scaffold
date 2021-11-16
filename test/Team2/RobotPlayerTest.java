@@ -241,5 +241,6 @@ public class RobotPlayerTest {
 				newdangerX = dangerX+1;
 				assertEquals(1, dangerX+1);
 			}
+
 		}
 }
