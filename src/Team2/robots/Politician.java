@@ -15,7 +15,9 @@ public class Politician extends AbstractRobot
           rc.senseNearbyRobots(actionRadius, Team.NEUTRAL));
     int turnCount = pursueNeutralECs(rc, rc.senseNearbyRobots(actionRadius,enemy), rc.senseNearbyRobots(actionRadius, Team.NEUTRAL));
     if( turnCount < 0)
+    {
       tryRandomMove(rc);
+    }
     else if(turnCount > 0){
       Direction directionality = Direction.CENTER;
     }
@@ -25,7 +27,7 @@ public class Politician extends AbstractRobot
    * @return -1 if the total number of elements is smaller than 12, 0 is [12,800], if its bigger than 800 return 1
    * @throws GameActionException
    */
-  static int pursueNeutralECs(RobotController rc,RobotInfo[] enemy, RobotInfo[] neutral) throws GameActionException
+  public static int pursueNeutralECs(RobotController rc,RobotInfo[] enemy, RobotInfo[] neutral) throws GameActionException
   {
       int turnCount = enemy.length + neutral.length;
       if(turnCount <=12)
@@ -72,7 +74,7 @@ public class Politician extends AbstractRobot
   }
 
   // Can attack an enemy base or muckraker
-  static int canattackanenemy(RobotController rc,  int actionRadius, Team enemyTeam) throws GameActionException {
+  public static int canattackanenemy(RobotController rc,  int actionRadius, Team enemyTeam) throws GameActionException {
     RobotInfo[] attackable = rc.senseNearbyRobots(actionRadius, enemyTeam);
     for (RobotInfo enemy : attackable) {
       if (enemy.type == RobotType.ENLIGHTENMENT_CENTER){
@@ -85,7 +87,7 @@ public class Politician extends AbstractRobot
     }
     return -1;
   }
-  static int empower(RobotController rc, int actionRadius, RobotInfo[] enemy, RobotInfo[] neutral) throws GameActionException
+  public static int empower(RobotController rc, int actionRadius, RobotInfo[] enemy, RobotInfo[] neutral) throws GameActionException
   {
 //    if (attackable.length != 3 && rc.canEmpower(actionRadius)) {
 //      System.out.println("empowering...");
