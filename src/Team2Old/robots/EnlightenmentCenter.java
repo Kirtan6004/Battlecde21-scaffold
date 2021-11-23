@@ -1,9 +1,6 @@
-package Team2.robots;
+package Team2Old.robots;
 
 import battlecode.common.*;
-
-import java.util.HashSet;
-import java.util.Set;
 
 
 public class EnlightenmentCenter extends AbstractRobot {
@@ -93,13 +90,13 @@ public class EnlightenmentCenter extends AbstractRobot {
     else if (rc.getRoundNum() > 501 && rc.getRoundNum() < 1001) {
       if (rc.getInfluence() > 100) {
         for (Direction dir : directions) {
-          if (rc.canBuildRobot(RobotType.MUCKRAKER, dir, influence) && switchSPM < 3) {
+          if (rc.canBuildRobot(RobotType.MUCKRAKER, dir, influence) && switchSPM < 4) {
             makeMuck(rc, 0, 2, dir);
             switchSPM++;
-          } if (rc.canBuildRobot(RobotType.SLANDERER, dir, influence) && switchSPM < 10 && switchSPM > 2) {
+          } if (rc.canBuildRobot(RobotType.SLANDERER, dir, influence) && switchSPM < 8 && switchSPM > 3) {
             makeSlan(rc, 0, 1, dir);
             switchSPM++;
-          } if (rc.canBuildRobot(RobotType.POLITICIAN, dir, influence) && switchSPM == 10) {
+          } if (rc.canBuildRobot(RobotType.POLITICIAN, dir, influence) && switchSPM == 8) {
             makePol(rc, 0, 3, dir);
             switchSPM = 0;
           }
@@ -114,20 +111,18 @@ public class EnlightenmentCenter extends AbstractRobot {
     }
     else if (rc.getRoundNum() >= 1001) {
       for (Direction dir : directions) {
-        if (rc.getInfluence() > 100) {
-          if (rc.canBuildRobot(RobotType.POLITICIAN, dir, influence) && (rc.getInfluence() >= 50)) {
-            makePol(rc, 0, 3, dir);
-          }
-          if (rc.canBuildRobot(RobotType.SLANDERER, dir, influence) && (rc.getInfluence() > 50)) {
-            makeSlan(rc, 0, 1, dir);
-          }
-          if (rc.canBuildRobot(RobotType.MUCKRAKER, dir, influence) && (rc.getInfluence() > 50)) {
-            makeMuck(rc, 0, 2, dir);
-          }
+        if (rc.canBuildRobot(RobotType.POLITICIAN, dir, influence) && (rc.getInfluence() >= 50)) {
+          makePol(rc, 0, 3, dir);
+        }
+        if (rc.canBuildRobot(RobotType.SLANDERER, dir, influence) && (rc.getInfluence() > 50)) {
+          makeSlan(rc, 0, 1, dir);
+        }
+        if (rc.canBuildRobot(RobotType.MUCKRAKER, dir, influence) && (rc.getInfluence() > 50)) {
+          makeMuck(rc, 0, 2, dir);
         }
       }
       int leftoverInf = rc.getInfluence();
-      int bid_num = leftoverInf - 75;
+      int bid_num = leftoverInf - influence;
       if (bid_num >= 0) {
         rc.bid(bid_num);
       }
