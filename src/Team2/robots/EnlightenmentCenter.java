@@ -63,9 +63,10 @@ public class EnlightenmentCenter extends AbstractRobot {
     int votes;
     votes = rc.getTeamVotes();
 
-    if (turnCount < 501) {
+    if (rc.getRoundNum() < 501) {
       if (rc.getInfluence() >= 50) {
         for (Direction dir : directions) {
+          System.out.println("TC: " + rc.getRoundNum());
           if (rc.canBuildRobot(RobotType.MUCKRAKER, dir, influence) && ((numSP % 20) == 0) && (numSP != 0) && (muck != 1)) {
             makeMuck(rc, 0, 2, dir);
             muck = 1;
@@ -79,8 +80,6 @@ public class EnlightenmentCenter extends AbstractRobot {
             switchSPM = 0;
             numSP++;
             muck = 0;
-          } if (turnCount >= 500) {
-            break;
           }
         }
       }
@@ -91,22 +90,18 @@ public class EnlightenmentCenter extends AbstractRobot {
       }
       int byteCodeLeft = Clock.getBytecodesLeft();
     }
-    else if (turnCount > 501 && turnCount < 1001) {
-      if (rc.getInfluence() >= 50) {
+    else if (rc.getRoundNum() > 501 && rc.getRoundNum() < 1001) {
+      if (rc.getInfluence() > 100) {
         for (Direction dir : directions) {
-          if (rc.canBuildRobot(RobotType.SLANDERER, dir, influence) && ((numPM % 20) == 0) && (numPM != 0) && (slan != 1)) {
-            makeSlan(rc, 0, 1, dir);
-            slan = 1;
-          } if (rc.canBuildRobot(RobotType.POLITICIAN, dir, influence) && switchSPM == 0) {
-            makePol(rc, 0, 3, dir);
-            switchSPM = 1;
-            numPM++;
-            slan = 0;
-          } if (rc.canBuildRobot(RobotType.MUCKRAKER, dir, influence) && switchSPM == 1) {
+          if (rc.canBuildRobot(RobotType.MUCKRAKER, dir, influence) && switchSPM < 4) {
             makeMuck(rc, 0, 2, dir);
+            switchSPM++;
+          } if (rc.canBuildRobot(RobotType.SLANDERER, dir, influence) && switchSPM < 8 && switchSPM > 3) {
+            makeSlan(rc, 0, 1, dir);
+            switchSPM++;
+          } if (rc.canBuildRobot(RobotType.POLITICIAN, dir, influence) && switchSPM == 8) {
+            makePol(rc, 0, 3, dir);
             switchSPM = 0;
-            numPM++;
-            slan = 0;
           }
         }
       }
@@ -117,7 +112,7 @@ public class EnlightenmentCenter extends AbstractRobot {
       }
       int byteCodeLeft = Clock.getBytecodesLeft();
     }
-    else if (turnCount >= 1001) {
+    else if (rc.getRoundNum() >= 1001) {
       for (Direction dir : directions) {
         if (rc.canBuildRobot(RobotType.POLITICIAN, dir, influence) && (rc.getInfluence() >= 50)) {
           makePol(rc, 0, 3, dir);
