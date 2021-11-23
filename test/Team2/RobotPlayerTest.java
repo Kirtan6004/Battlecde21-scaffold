@@ -120,24 +120,24 @@ public class RobotPlayerTest {
 		ec = mock(EnlightenmentCenter.class);
 
 		if (rc.getInfluence() >= 100) {
-			EnlightenmentCenter.run(rc);
-			RobotType type0 = EnlightenmentCenter.makeRobots(rc,0, Direction.NORTHEAST);
+			ec.run(rc);
+			RobotType type0 = ec.makeRobots(rc,0, Direction.NORTHEAST);
 			assertEquals(RobotType.POLITICIAN, type0);
-			RobotType type1 = EnlightenmentCenter.makeRobots(rc,1, Direction.NORTHEAST);
+			RobotType type1 = ec.makeRobots(rc,1, Direction.NORTHEAST);
 			assertEquals(RobotType.SLANDERER, type1);
-			RobotType type2 = EnlightenmentCenter.makeRobots(rc, 2, Direction.NORTHEAST);
+			RobotType type2 = ec.makeRobots(rc, 2, Direction.NORTHEAST);
 			assertEquals(RobotType.MUCKRAKER, type2);
-			RobotType type3 = EnlightenmentCenter.makeRobots(rc, 3, Direction.NORTHEAST);
+			RobotType type3 = ec.makeRobots(rc, 3, Direction.NORTHEAST);
 			assertEquals(RobotType.POLITICIAN, type3);
 		} else {
 			EnlightenmentCenter.run(rc);
-			RobotType type0 = EnlightenmentCenter.makeRobots(rc, 0, Direction.NORTHEAST);
+			RobotType type0 = ec.makeRobots(rc, 0, Direction.NORTHEAST);
 			assertNull(type0);
-			RobotType type1 = EnlightenmentCenter.makeRobots(rc, 1, Direction.NORTHEAST);
+			RobotType type1 = ec.makeRobots(rc, 1, Direction.NORTHEAST);
 			assertNull(type1);
-			RobotType type2 = EnlightenmentCenter.makeRobots(rc, 2, Direction.NORTHEAST);
+			RobotType type2 = ec.makeRobots(rc, 2, Direction.NORTHEAST);
 			assertNull(type2);
-			RobotType type3 = EnlightenmentCenter.makeRobots(rc, 3, Direction.NORTHEAST);
+			RobotType type3 = ec.makeRobots(rc, 3, Direction.NORTHEAST);
 			assertNull(type3);
 		}
 	}
