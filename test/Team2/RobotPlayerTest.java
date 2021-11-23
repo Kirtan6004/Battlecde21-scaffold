@@ -121,23 +121,23 @@ public class RobotPlayerTest {
 
 		if (rc.getInfluence() >= 100) {
 			ec.run(rc);
-			RobotType type0 = ec.makeRobots(rc,0, Direction.NORTHEAST);
+			RobotType type0 = ec.makePol(rc,0, 0,Direction.NORTHEAST);
 			assertEquals(RobotType.POLITICIAN, type0);
-			RobotType type1 = ec.makeRobots(rc,1, Direction.NORTHEAST);
+			RobotType type1 = ec.makeSlan(rc, 0, 1, Direction.NORTHEAST);
 			assertEquals(RobotType.SLANDERER, type1);
-			RobotType type2 = ec.makeRobots(rc, 2, Direction.NORTHEAST);
+			RobotType type2 = ec.makeMuck(rc, 0, 2, Direction.NORTHEAST);
 			assertEquals(RobotType.MUCKRAKER, type2);
-			RobotType type3 = ec.makeRobots(rc, 3, Direction.NORTHEAST);
+			RobotType type3 = ec.makePol(rc, 0, 3, Direction.NORTHEAST);
 			assertEquals(RobotType.POLITICIAN, type3);
 		} else {
 			EnlightenmentCenter.run(rc);
-			RobotType type0 = ec.makeRobots(rc, 0, Direction.NORTHEAST);
+			RobotType type0 = ec.makePol(rc, 0, 0, Direction.NORTHEAST);
 			assertNull(type0);
-			RobotType type1 = ec.makeRobots(rc, 1, Direction.NORTHEAST);
+			RobotType type1 = ec.makeSlan(rc, 0, 1, Direction.NORTHEAST);
 			assertNull(type1);
-			RobotType type2 = ec.makeRobots(rc, 2, Direction.NORTHEAST);
+			RobotType type2 = ec.makeMuck(rc, 0, 2, Direction.NORTHEAST);
 			assertNull(type2);
-			RobotType type3 = ec.makeRobots(rc, 3, Direction.NORTHEAST);
+			RobotType type3 = ec.makePol(rc,0,  3, Direction.NORTHEAST);
 			assertNull(type3);
 		}
 	}
@@ -151,7 +151,7 @@ public class RobotPlayerTest {
 		RobotInfo ec = new RobotInfo(1, Team.A, RobotType.ENLIGHTENMENT_CENTER,200, 100, mapLocation);
 		assertEquals(200, ec.getInfluence());
 		rc.buildRobot(RobotType.ENLIGHTENMENT_CENTER, Direction.NORTHEAST, 200);
-		RobotType ret = EnlightenmentCenter.makePol(rc, 3, Direction.NORTHEAST);
+		RobotType ret = EnlightenmentCenter.makePol(rc,0,  3, Direction.NORTHEAST);
 		if (rc.getInfluence() >= 100) {
 			assertEquals(RobotType.POLITICIAN, ret);
 		}
@@ -165,7 +165,7 @@ public class RobotPlayerTest {
 		testplayer = mock(RobotPlayer.class);
 		ec = mock(EnlightenmentCenter.class);
 		rc = mock(RobotController.class);
-		RobotType ret = EnlightenmentCenter.makeSlan(rc, 3, Direction.NORTHEAST);
+		RobotType ret = EnlightenmentCenter.makeSlan(rc, 0, 3, Direction.NORTHEAST);
 		if (rc.getInfluence() >= 100) {
 			assertEquals(RobotType.SLANDERER, ret);
 		}
@@ -179,7 +179,7 @@ public class RobotPlayerTest {
 		testplayer = mock(RobotPlayer.class);
 		ec = mock(EnlightenmentCenter.class);
 		rc = mock(RobotController.class);
-		RobotType ret = EnlightenmentCenter.makeMuck(rc, 3, Direction.NORTHEAST);
+		RobotType ret = EnlightenmentCenter.makeMuck(rc, 0, 3, Direction.NORTHEAST);
 		if (rc.getInfluence() >= 100) {
 			assertEquals(RobotType.MUCKRAKER, ret);
 		}

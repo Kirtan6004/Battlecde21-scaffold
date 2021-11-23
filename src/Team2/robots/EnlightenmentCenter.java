@@ -11,6 +11,8 @@ public class EnlightenmentCenter extends AbstractRobot {
   static int influence = 50;
   public static int lastRobot = 0;
   public static int switchSP = 0;
+  public static int numSP = 0;
+  public static int muck = 0;
 
   public static RobotType makeFlag(RobotController rc, int flagValue, Direction d, RobotType r, int lastR) throws GameActionException {
     rc.buildRobot(r, d, influence);
@@ -25,7 +27,7 @@ public class EnlightenmentCenter extends AbstractRobot {
     return r;
   }
 
-  public static RobotType makePol(RobotController rc, int last, Direction d) throws GameActionException {
+  public static RobotType makePol(RobotController rc, int flagValue, int last, Direction d) throws GameActionException {
     if (rc.canBuildRobot(RobotType.POLITICIAN, d, influence)) {
       return makeFlag(rc, 0, d, RobotType.POLITICIAN, last);
     }
@@ -35,59 +37,52 @@ public class EnlightenmentCenter extends AbstractRobot {
     return null;
   }
 
-  public static RobotType makeSlan(RobotController rc, int last, Direction d) throws GameActionException {
+  public static RobotType makeSlan(RobotController rc, int flagValue, int last, Direction d) throws GameActionException {
     if (rc.canBuildRobot(RobotType.SLANDERER, d, influence)) {
       return makeFlag(rc, 0, d, RobotType.SLANDERER, last);
     }
+    if (rc.canSetFlag(flagValue++) && Clock.getBytecodesLeft() > 0) {
+      rc.setFlag(flagValue);
+    }
     return null;
   }
 
-  public static RobotType makeMuck(RobotController rc, int last, Direction d) throws GameActionException {
+  public static RobotType makeMuck(RobotController rc, int flagValue, int last, Direction d) throws GameActionException {
     if (rc.canBuildRobot(RobotType.MUCKRAKER, d, influence)) {
       return makeFlag(rc, 0, d, RobotType.MUCKRAKER, last);
     }
-    return null;
-  }
-
-  public static RobotType makeRobots(RobotController rc, int last, Direction d) throws GameActionException {
-    if (last == 1) {
-      return makeSlan(rc, last, d);
-    } else if (last == 2) {
-      return makeMuck(rc, last, d);
-    } else {
-      return makePol(rc, last, d);
+    if (rc.canSetFlag(flagValue++) && Clock.getBytecodesLeft() > 0) {
+      rc.setFlag(flagValue);
     }
+    return null;
   }
 
   public static void run(RobotController rc) throws GameActionException {
     int votes;
     votes = rc.getTeamVotes();
 
+    //makePol(RobotController rc, int flagValue, int last, Direction d)
+
     if (turnCount < 501) {
       int spMade = 0;
-      for (Direction dir : directions) {
-        while (rc.canBuildRobot(RobotType.SLANDERER, dir, influence) && rc.canBuildRobot(RobotType.POLITICIAN, dir, influence) && (rc.getInfluence() >= 100)) {
-          if (switchSP == 0) {
-            makeRobots(rc, 1, dir);
+      if (rc.getInfluence() >= 50) {
+        for (Direction dir : directions) {
+          if (rc.canBuildRobot(RobotType.MUCKRAKER, dir, influence) && ((numSP % 20) == 0) && (numSP != 0) && (muck != 1)) {
+            makeMuck(rc, 0, 2, dir);
+            muck = 1;
+          } if (rc.canBuildRobot(RobotType.POLITICIAN, dir, influence) && switchSP == 0) {
+            makePol(rc, 0, 3, dir);
             switchSP = 1;
-            spMade = 1;
-          }
-          else if (switchSP == 1) {
-            makeRobots(rc, 3, dir);
-            switchSP = 0;
             spMade = 2;
+            numSP++;
+            muck = 0;
+          } if (rc.canBuildRobot(RobotType.SLANDERER, dir, influence) && switchSP == 1) {
+            makeSlan(rc, 0, 1, dir);
+            switchSP = 0;
+            spMade = 1;
+            numSP++;
+            muck = 0;
           }
-        }
-      }
-      for (Direction dir : directions) {
-        if (spMade == 0 && rc.canBuildRobot(RobotType.SLANDERER, dir, influence) && (rc.getInfluence() > 50)) {
-          makeRobots(rc, 1, dir);
-        }
-        else if (spMade < 2 && rc.canBuildRobot(RobotType.POLITICIAN, dir, influence) && (rc.getInfluence() > 50)) {
-          makeRobots(rc, 3, dir);
-        }
-        else if (rc.canBuildRobot(RobotType.MUCKRAKER, dir, influence) && (rc.getInfluence() > 50)) {
-          makeRobots(rc, 2, dir);
         }
       }
       int leftoverInf = rc.getInfluence();
@@ -100,15 +95,15 @@ public class EnlightenmentCenter extends AbstractRobot {
     else if (turnCount > 501 && turnCount < 1001) {
       for (Direction dir : directions) {
         while (rc.canBuildRobot(RobotType.POLITICIAN, dir, influence) && (rc.getInfluence() >= 150)) {
-          makeRobots(rc, 3, dir);
+          makePol(rc, 0, 3, dir);
         }
       }
       for (Direction dir : directions) {
         if (rc.canBuildRobot(RobotType.SLANDERER, dir, influence) && (rc.getInfluence() > 50)) {
-          makeRobots(rc, 1, dir);
+          makeSlan(rc, 0, 1, dir);
         }
         if (rc.canBuildRobot(RobotType.MUCKRAKER, dir, influence) && (rc.getInfluence() > 50)) {
-          makeRobots(rc, 2, dir);
+          makeMuck(rc, 0, 2, dir);
         }
       }
       int leftoverInf = rc.getInfluence();
@@ -121,13 +116,13 @@ public class EnlightenmentCenter extends AbstractRobot {
     else if (turnCount >= 1001) {
       for (Direction dir : directions) {
         if (rc.canBuildRobot(RobotType.POLITICIAN, dir, influence) && (rc.getInfluence() >= 50)) {
-          makeRobots(rc, 3, dir);
+          makePol(rc, 0, 3, dir);
         }
         if (rc.canBuildRobot(RobotType.SLANDERER, dir, influence) && (rc.getInfluence() > 50)) {
-          makeRobots(rc, 1, dir);
+          makeSlan(rc, 0, 1, dir);
         }
         if (rc.canBuildRobot(RobotType.MUCKRAKER, dir, influence) && (rc.getInfluence() > 50)) {
-          makeRobots(rc, 2, dir);
+          makeMuck(rc, 0, 2, dir);
         }
       }
       int leftoverInf = rc.getInfluence();
