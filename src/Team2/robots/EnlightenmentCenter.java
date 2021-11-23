@@ -7,14 +7,11 @@ import java.util.Set;
 
 
 public class EnlightenmentCenter extends AbstractRobot {
-  static int turnCount;
   static int influence = 50;
   public static int lastRobot = 0;
   public static int switchSPM = 0;
   public static int numSP = 0;
-  public static int numPM = 0;
   public static int muck = 0;
-  public static int slan = 0;
 
   public static RobotType makeFlag(RobotController rc, int flagValue, Direction d, RobotType r, int lastR) throws GameActionException {
     rc.buildRobot(r, d, influence);
@@ -59,79 +56,107 @@ public class EnlightenmentCenter extends AbstractRobot {
     return null;
   }
 
-  public static void run(RobotController rc) throws GameActionException {
-    int votes;
-    votes = rc.getTeamVotes();
+  public static void ecBid(RobotController rc, int inf) throws GameActionException {
+    int bid_num = rc.getInfluence() - inf;
+    if (bid_num >= 0) {
+      rc.bid(bid_num);
+    }
+  }
 
+  public static void ftMakeMuck(RobotController rc, Direction d) throws GameActionException {
+    if (rc.canBuildRobot(RobotType.MUCKRAKER, d, influence) && ((numSP % 20) == 0) && (numSP != 0) && (muck != 1)) {
+      makeMuck(rc, 0, 2, d);
+      muck = 1;
+    }
+  }
+
+  public static void ftMakeRobots(RobotController rc, Direction d) throws GameActionException {
+    if (rc.canBuildRobot(RobotType.POLITICIAN, d, influence) && switchSPM == 0) {
+      makePol(rc, 0, 3, d);
+      switchSPM = 1;
+      numSP++;
+      muck = 0;
+    } if (rc.canBuildRobot(RobotType.SLANDERER, d, influence) && switchSPM == 1) {
+      makeSlan(rc, 0, 1, d);
+      switchSPM = 0;
+      numSP++;
+      muck = 0;
+    }
+  }
+
+  public static void firstThird(RobotController rc) throws GameActionException {
+    if (rc.getInfluence() >= 50) {
+      for (Direction dir : directions) {
+        ftMakeRobots(rc, dir);
+      }
+    }
+    ecBid(rc, 50);
+  }
+
+  public static void sdMakeSlan (RobotController rc, Direction d) throws GameActionException {
+    if (rc.canBuildRobot(RobotType.SLANDERER, d, influence) && switchSPM < 10 && switchSPM > 2) {
+      makeSlan(rc, 0, 1, d);
+      switchSPM++;
+    }
+  }
+
+  public static void sdMakeRobots(RobotController rc, Direction d) throws GameActionException {
+    if (rc.canBuildRobot(RobotType.MUCKRAKER, d, influence) && switchSPM < 3) {
+      makeMuck(rc, 0, 2, d);
+      switchSPM++;
+    }
+    sdMakeSlan(rc, d);
+    if (rc.canBuildRobot(RobotType.POLITICIAN, d, influence) && switchSPM == 10) {
+      makePol(rc, 0, 3, d);
+      switchSPM = 0;
+    }
+  }
+
+  public static void secondThird(RobotController rc) throws GameActionException {
+    if (rc.getInfluence() > 100) {
+      for (Direction dir : directions) {
+        sdMakeRobots(rc, dir);
+      }
+    }
+    ecBid(rc, 50);
+  }
+
+  public static void ltMakePol (RobotController rc, Direction d) throws GameActionException {
+    if (rc.canBuildRobot(RobotType.POLITICIAN, d, influence) && (rc.getInfluence() >= 50)) {
+      makePol(rc, 0, 3, d);
+    }
+  }
+
+  public static void ltMakeRobots(RobotController rc, Direction d) throws GameActionException {
+    ltMakePol(rc, d);
+    if (rc.getInfluence() > 50) {
+      if (rc.canBuildRobot(RobotType.SLANDERER, d, influence)) {
+        makeSlan(rc, 0, 1, d);
+      }
+      if (rc.canBuildRobot(RobotType.MUCKRAKER, d, influence)) {
+        makeMuck(rc, 0, 2, d);
+      }
+    }
+  }
+
+  public static void lastThird(RobotController rc) throws GameActionException {
+    for (Direction dir : directions) {
+      if (rc.getInfluence() > 90) {
+        ltMakeRobots(rc, dir);
+      }
+    }
+    ecBid(rc, 75);
+  }
+
+  public static void run(RobotController rc) throws GameActionException {
     if (rc.getRoundNum() < 501) {
-      if (rc.getInfluence() >= 50) {
-        for (Direction dir : directions) {
-          System.out.println("TC: " + rc.getRoundNum());
-          if (rc.canBuildRobot(RobotType.MUCKRAKER, dir, influence) && ((numSP % 20) == 0) && (numSP != 0) && (muck != 1)) {
-            makeMuck(rc, 0, 2, dir);
-            muck = 1;
-          } if (rc.canBuildRobot(RobotType.POLITICIAN, dir, influence) && switchSPM == 0) {
-            makePol(rc, 0, 3, dir);
-            switchSPM = 1;
-            numSP++;
-            muck = 0;
-          } if (rc.canBuildRobot(RobotType.SLANDERER, dir, influence) && switchSPM == 1) {
-            makeSlan(rc, 0, 1, dir);
-            switchSPM = 0;
-            numSP++;
-            muck = 0;
-          }
-        }
-      }
-      int leftoverInf = rc.getInfluence();
-      if (leftoverInf > influence) {
-        int bid_num = leftoverInf - influence;
-        rc.bid(bid_num);
-      }
-      int byteCodeLeft = Clock.getBytecodesLeft();
+      firstThird(rc);
     }
     else if (rc.getRoundNum() > 501 && rc.getRoundNum() < 1001) {
-      if (rc.getInfluence() > 100) {
-        for (Direction dir : directions) {
-          if (rc.canBuildRobot(RobotType.MUCKRAKER, dir, influence) && switchSPM < 3) {
-            makeMuck(rc, 0, 2, dir);
-            switchSPM++;
-          } if (rc.canBuildRobot(RobotType.SLANDERER, dir, influence) && switchSPM < 10 && switchSPM > 2) {
-            makeSlan(rc, 0, 1, dir);
-            switchSPM++;
-          } if (rc.canBuildRobot(RobotType.POLITICIAN, dir, influence) && switchSPM == 10) {
-            makePol(rc, 0, 3, dir);
-            switchSPM = 0;
-          }
-        }
-      }
-      int leftoverInf = rc.getInfluence();
-      if (leftoverInf > influence) {
-        int bid_num = leftoverInf - influence;
-        rc.bid(bid_num);
-      }
-      int byteCodeLeft = Clock.getBytecodesLeft();
+      secondThird(rc);
     }
-    else if (rc.getRoundNum() >= 1001) {
-      for (Direction dir : directions) {
-        if (rc.getInfluence() > 100) {
-          if (rc.canBuildRobot(RobotType.POLITICIAN, dir, influence) && (rc.getInfluence() >= 50)) {
-            makePol(rc, 0, 3, dir);
-          }
-          if (rc.canBuildRobot(RobotType.SLANDERER, dir, influence) && (rc.getInfluence() > 50)) {
-            makeSlan(rc, 0, 1, dir);
-          }
-          if (rc.canBuildRobot(RobotType.MUCKRAKER, dir, influence) && (rc.getInfluence() > 50)) {
-            makeMuck(rc, 0, 2, dir);
-          }
-        }
-      }
-      int leftoverInf = rc.getInfluence();
-      int bid_num = leftoverInf - 75;
-      if (bid_num >= 0) {
-        rc.bid(bid_num);
-      }
-      int byteCodeLeft = Clock.getBytecodesLeft();
+    else {
+      lastThird(rc);
     }
   }
 }
