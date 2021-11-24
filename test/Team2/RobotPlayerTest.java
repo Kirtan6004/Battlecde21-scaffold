@@ -30,17 +30,47 @@ public class RobotPlayerTest {
 	Slanderer slandererplayer;
 	Politician politicianplayer;
 
+	/*public void robotPlayerTest() throws GameActionException
+	{
+		testplayer = mock(RobotPlayer.class);
+		testplayer.rc = mock(RobotController.class);
+		testSwitchItem(testplayer, RobotType.ENLIGHTENMENT_CENTER, 0);
+		//when(Politician.canattackanenemy(testplayer.rc, 4, Team.B)).
+		testSwitchItem(testplayer, RobotType.POLITICIAN, 0);
+		testSwitchItem(testplayer, RobotType.SLANDERER, 0);
+		testSwitchItem(testplayer, RobotType.MUCKRAKER, 0);
+	}*/
+
+	private void testSwitchItem(RobotPlayer testplayer, RobotType type, int retval) throws GameActionException
+	{
+		when(testplayer.rc.getType()).thenReturn(type);
+		int result = testplayer.switchType();
+		assertEquals(result, retval);
+	}
+
 	@Test
 	public void runMuckrakerTest() throws GameActionException
 	{
 		testplayer = mock(RobotPlayer.class);
 		testplayer.rc = mock(RobotController.class);
-		when(testplayer.rc.getType()).thenReturn(RobotType.MUCKRAKER);
+		when(testplayer.rc.getType()).thenReturn(null);
 		when(testplayer.rc.getTeam()).thenReturn(Team.A);
 		when(testplayer.rc.getLocation()).thenReturn(new MapLocation(0,0));
-
+		testMuckRun(testplayer);
 		muckrackerSlanderTest();
 		muckrackerECTest();
+	}
+
+	/**test the run(rc) function specifically*/
+	private void testMuckRun(RobotPlayer rp) throws GameActionException
+	{
+		MapLocation far = new MapLocation(10,10);
+		RobotInfo[] invalid = {
+				  new RobotInfo(1, Team.B, RobotType.POLITICIAN, 10, 10, far)
+		};
+		when(rp.rc.senseNearbyRobots()).thenReturn(invalid);
+		when(rp.rc.getType()).thenReturn(RobotType.MUCKRAKER);
+		Muckraker.run(rp.rc);
 	}
 
 	private void muckrackerSlanderTest() throws GameActionException
@@ -54,6 +84,9 @@ public class RobotPlayerTest {
 		RobotInfo[] robots2 = {
 				  new RobotInfo(3, Team.B, RobotType.SLANDERER,10,10, far)
 		};
+		RobotInfo[] friendly = {
+				  new RobotInfo(4, Team.A, RobotType.SLANDERER,10,10, far)
+		};
 		RobotInfo[] invalid = {
 				  new RobotInfo(1, Team.B, RobotType.POLITICIAN, 10, 10, near)
 		};
@@ -65,6 +98,9 @@ public class RobotPlayerTest {
 		assertEquals(-2, reaction);
 		//nothing in range
 		reaction = muckraker.dealWithSlanderer(empty, testplayer.rc);
+		assertEquals(-1, reaction);
+		//friendly units
+		reaction = muckraker.dealWithSlanderer(friendly, testplayer.rc);
 		assertEquals(-1, reaction);
 		//slanderer is close enough to convert
 		when(testplayer.rc.canExpose(near)).thenReturn(true);

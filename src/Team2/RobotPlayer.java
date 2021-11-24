@@ -32,8 +32,6 @@ public strictfp class RobotPlayer {
     static int influence = 100;
     // Add New Var on here
 
-    static Set<Integer> flagsSeen = new HashSet<Integer>();
-
     public static int lastRobot = 0;
 
     /**
@@ -57,12 +55,7 @@ public strictfp class RobotPlayer {
                 // Here, we've separated the controls into a different method for each RobotType.
                 // You may rewrite this into your own control structure if you wish.
                 //System.out.println("I'm a " + rc.getType() + "! Location " + rc.getLocation());
-                switch (rc.getType()) {
-                    case ENLIGHTENMENT_CENTER: EnlightenmentCenter.run(rc); break;
-                    case POLITICIAN:           Politician.run(rc);       break;
-                    case SLANDERER:            Slanderer.runSlanderer(rc);break;
-                    case MUCKRAKER:            Muckraker.run(rc);        break;
-                }
+                switchType();
 
                 // Clock.yield() makes the robot wait until the next turn, then it will perform this loop again
                 Clock.yield();
@@ -74,79 +67,14 @@ public strictfp class RobotPlayer {
         }
     }
 
-    static int WhenOpponentsAreFound(RobotInfo[] enemies, MapLocation location, RobotController rctemp) throws GameActionException
+    public static int switchType() throws GameActionException
     {
-        rc = rctemp;
-        int dangerX = 0;
-        int dangerY = 0;
-        if (enemies.length > 0)
-        {
-            for(RobotInfo r : enemies)
-            {
-                if(r.getType() == RobotType.MUCKRAKER){
-                    //FLY YOU FOOLS!
-                    MapLocation enemyloc = r.getLocation();
-                    if(enemyloc.x > location.x)
-                        dangerX--;
-                    else
-                        dangerX++;
-
-                    if(enemyloc.y > location.y)
-                        dangerY--;
-                    else
-                        dangerY++;
-                }
-            }
-            MapLocation safety = location.translate(Integer.signum(dangerX),
-                    Integer.signum(dangerY));
-            tryMove(location.directionTo(safety));
-            return 1;
+        switch (rc.getType()) {
+            case ENLIGHTENMENT_CENTER: EnlightenmentCenter.run(rc); return 0;
+            case POLITICIAN:           Politician.run(rc);          return 1;
+            case SLANDERER:            Slanderer.runSlanderer(rc);  return 2;
+            case MUCKRAKER:            Muckraker.run(rc);           return 3;
         }
-        else
-        {
-            tryMove(randomDirection());
-            return -1;
-        }
-    }
-
-    /**
-     * Returns a random Direction.
-     *
-     * @return a random Direction
-     */
-    static Direction randomDirection() {
-        return directions[(int) (Math.random() * directions.length)];
-    }
-
-    /**
-     * Returns a random spawnable RobotType
-     *
-     * @return a random RobotType
-     */
-    static RobotType randomSpawnableRobotType() {
-        return spawnableRobot[(int) (Math.random() * spawnableRobot.length)];
-    }
-
-    /**
-     * Attempts to move in a given direction.
-     *
-     * @param dir The intended direction of movement
-     * @return true if a move was performed
-     * @throws GameActionException
-     */
-    static boolean tryMove(Direction dir) throws GameActionException {
-
-        if (rc == null)
-        {
-            return false;
-        }
-        else
-        {
-            //System.out.println("I am trying to move " + dir + "; " + rc.isReady() + " " + rc.getCooldownTurns() + " " + rc.canMove(dir));
-            if (rc.canMove(dir)) {
-                rc.move(dir);
-                return true;
-            } else return false;
-        }
+        return -1;
     }
 }
