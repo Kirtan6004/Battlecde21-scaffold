@@ -1,10 +1,8 @@
 package Team2.robots;
 
 import battlecode.common.*;
-
 import java.util.HashSet;
 import java.util.Set;
-
 
 public class EnlightenmentCenter extends AbstractRobot {
   static int influence = 50;
