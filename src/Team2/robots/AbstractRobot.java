@@ -9,7 +9,8 @@ import battlecode.common.*;
 
 public abstract class AbstractRobot
 {
-    protected static Direction pastDirection;
+    public static Direction pastDirection;
+//    public static Object reflectedDirection;
     protected static MapLocation pastMapLocation;
 
     protected static final Direction[] directions = {
@@ -26,7 +27,7 @@ public abstract class AbstractRobot
 
     //Copied these functions over here to use in your classes
 
-    protected static boolean tryMove(Direction dir, RobotController rc) throws GameActionException
+    public static boolean tryMove(Direction dir, RobotController rc) throws GameActionException
     {
 
         if (rc == null)

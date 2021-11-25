@@ -1,12 +1,10 @@
 package Team2;
 
 import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.*;
 
-import Team2.robots.EnlightenmentCenter;
-import Team2.robots.Muckraker;
-import Team2.robots.Slanderer;
-import Team2.robots.Politician;
+import Team2.robots.*;
 import battlecode.common.*;
 import org.junit.Rule;
 import static org.mockito.Mockito.when;
@@ -242,8 +240,37 @@ public class RobotPlayerTest {
 		}
 		return 1;
 	}
+	@Test
+	public void tryMoveTest() throws GameActionException{
 
+		AbstractRobot tempBot = null;
+		boolean canMove = tempBot.tryMove(Direction.NORTHEAST,rc);
+		rc = null;
+		assertEquals(false, canMove);
+		MapLocation mapLocation = new MapLocation(2,2);
+		RobotInfo ec = new RobotInfo(1, Team.A, RobotType.ENLIGHTENMENT_CENTER,200, 100, mapLocation);
+		testplayer = mock(RobotPlayer.class);
+//		ec = mock(EnlightenmentCenter.class);
+		rc = mock(RobotController.class);
+//		RobotInfo ec = new RobotInfo(1, Team.A, RobotType.ENLIGHTENMENT_CENTER,200, 100, mapLocation);
+		//		assertEquals(true, );
+		canMove = tempBot.tryMove(Direction.NORTHEAST, rc);
+		assertEquals(true, canMove);
+	}
+	@Test
+	public void reflectedDirectionTest() throws GameActionException{
+		AbstractRobot tempBot = null;
+		testplayer = mock(RobotPlayer.class);
+		ec = mock(EnlightenmentCenter.class);
+		rc = mock(RobotController.class);
+		MapLocation mapLocation = new MapLocation(2,2);
+		RobotInfo ec = new RobotInfo(1, Team.A, RobotType.ENLIGHTENMENT_CENTER,200, 100, mapLocation);
+		AbstractRobot.pastDirection = Direction.NORTH;
+//		AbstractRobot.reflectedDirection(rc);
+		AbstractRobot.tryMove(Direction.NORTH, rc);
+		assertEquals(Direction.NORTH, AbstractRobot.pastDirection);
 
+	}
 		@Test
 		public void politicianTest() throws GameActionException
 		{
