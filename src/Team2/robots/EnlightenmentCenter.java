@@ -71,6 +71,7 @@ public class EnlightenmentCenter extends AbstractRobot {
   }
 
   public static void ftMakeRobots(RobotController rc, Direction d) throws GameActionException {
+    ftMakeMuck(rc, d);
     if (rc.canBuildRobot(RobotType.POLITICIAN, d, influence) && switchSPM == 0) {
       makePol(rc, 0, 3, d);
       switchSPM = 1;
