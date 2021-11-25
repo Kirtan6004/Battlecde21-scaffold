@@ -243,8 +243,8 @@ public class RobotPlayerTest {
 	@Test
 	public void tryMoveTest() throws GameActionException{
 
-		AbstractRobot tempBot = null;
-		boolean canMove = tempBot.tryMove(Direction.NORTHEAST,rc);
+//		AbstractRobot tempBot = null;
+		boolean canMove = AbstractRobot.tryMove(Direction.NORTHEAST,rc);
 		rc = null;
 		assertEquals(false, canMove);
 		MapLocation mapLocation = new MapLocation(2,2);
@@ -254,7 +254,7 @@ public class RobotPlayerTest {
 		rc = mock(RobotController.class);
 //		RobotInfo ec = new RobotInfo(1, Team.A, RobotType.ENLIGHTENMENT_CENTER,200, 100, mapLocation);
 		//		assertEquals(true, );
-		canMove = tempBot.tryMove(Direction.NORTHEAST, rc);
+		canMove = AbstractRobot.tryMove(Direction.NORTHEAST, rc);
 		assertEquals(true, canMove);
 	}
 	@Test
