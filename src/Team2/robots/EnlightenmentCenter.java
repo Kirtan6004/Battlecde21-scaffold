@@ -20,19 +20,22 @@ public class EnlightenmentCenter extends AbstractRobot {
     } else {
       lastRobot++;
     }
+    setFlag(flagValue, rc);
+    return r;
+  }
+
+  private static void setFlag(int flagValue, RobotController rc) throws GameActionException
+  {
     if (rc.canSetFlag(flagValue++) && Clock.getBytecodesLeft() > 0) {
       rc.setFlag(flagValue);
     }
-    return r;
   }
 
   public static RobotType makePol(RobotController rc, int flagValue, int last, Direction d) throws GameActionException {
     if (rc.canBuildRobot(RobotType.POLITICIAN, d, influence)) {
       return makeFlag(rc, 0, d, RobotType.POLITICIAN, last);
     }
-    if (rc.canSetFlag(flagValue++) && Clock.getBytecodesLeft() > 0) {
-      rc.setFlag(flagValue);
-    }
+    setFlag(flagValue, rc);
     return null;
   }
 
@@ -40,19 +43,17 @@ public class EnlightenmentCenter extends AbstractRobot {
     if (rc.canBuildRobot(RobotType.SLANDERER, d, influence)) {
       return makeFlag(rc, 0, d, RobotType.SLANDERER, last);
     }
-    if (rc.canSetFlag(flagValue++) && Clock.getBytecodesLeft() > 0) {
-      rc.setFlag(flagValue);
-    }
+    setFlag(flagValue, rc);
     return null;
   }
+
+
 
   public static RobotType makeMuck(RobotController rc, int flagValue, int last, Direction d) throws GameActionException {
     if (rc.canBuildRobot(RobotType.MUCKRAKER, d, influence)) {
       return makeFlag(rc, 0, d, RobotType.MUCKRAKER, last);
     }
-    if (rc.canSetFlag(flagValue++) && Clock.getBytecodesLeft() > 0) {
-      rc.setFlag(flagValue);
-    }
+    setFlag(flagValue, rc);
     return null;
   }
 
@@ -60,13 +61,6 @@ public class EnlightenmentCenter extends AbstractRobot {
     int bid_num = rc.getInfluence() - inf;
     if (bid_num >= 0) {
       rc.bid(bid_num);
-    }
-  }
-
-  public static void ftMakeMuck(RobotController rc, Direction d) throws GameActionException {
-    if (rc.canBuildRobot(RobotType.MUCKRAKER, d, influence) && ((numSP % 20) == 0) && (numSP != 0) && (muck != 1)) {
-      makeMuck(rc, 0, 2, d);
-      muck = 1;
     }
   }
 

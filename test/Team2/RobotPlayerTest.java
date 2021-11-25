@@ -137,28 +137,37 @@ public class RobotPlayerTest {
 		testplayer = mock(RobotPlayer.class);
 		rc = mock(RobotController.class);
 		ec = mock(EnlightenmentCenter.class);
+		Direction d = Direction.NORTHEAST;
+		int inf = 50;
+		when(rc.canBuildRobot(RobotType.POLITICIAN, d,inf)).thenReturn(true);
+		when(rc.canBuildRobot(RobotType.SLANDERER, d,inf)).thenReturn(true);
+		when(rc.canBuildRobot(RobotType.MUCKRAKER, d,inf)).thenReturn(true);
+		when(rc.getInfluence()).thenReturn(100);
+		ec.run(rc);
+		RobotType type0 = ec.makePol(rc,0, 0,Direction.NORTHEAST);
+		assertEquals(RobotType.POLITICIAN, type0);
+		RobotType type1 = ec.makeSlan(rc, 0, 1, Direction.NORTHEAST);
+		assertEquals(RobotType.SLANDERER, type1);
+		RobotType type2 = ec.makeMuck(rc, 0, 2, Direction.NORTHEAST);
+		assertEquals(RobotType.MUCKRAKER, type2);
+		RobotType type3 = ec.makePol(rc, 0, 3, Direction.NORTHEAST);
+		assertEquals(RobotType.POLITICIAN, type3);
 
-		if (rc.getInfluence() >= 100) {
-			ec.run(rc);
-			RobotType type0 = ec.makePol(rc,0, 0,Direction.NORTHEAST);
-			assertEquals(RobotType.POLITICIAN, type0);
-			RobotType type1 = ec.makeSlan(rc, 0, 1, Direction.NORTHEAST);
-			assertEquals(RobotType.SLANDERER, type1);
-			RobotType type2 = ec.makeMuck(rc, 0, 2, Direction.NORTHEAST);
-			assertEquals(RobotType.MUCKRAKER, type2);
-			RobotType type3 = ec.makePol(rc, 0, 3, Direction.NORTHEAST);
-			assertEquals(RobotType.POLITICIAN, type3);
-		} else {
-			EnlightenmentCenter.run(rc);
-			RobotType type0 = ec.makePol(rc, 0, 0, Direction.NORTHEAST);
-			assertNull(type0);
-			RobotType type1 = ec.makeSlan(rc, 0, 1, Direction.NORTHEAST);
-			assertNull(type1);
-			RobotType type2 = ec.makeMuck(rc, 0, 2, Direction.NORTHEAST);
-			assertNull(type2);
-			RobotType type3 = ec.makePol(rc,0,  3, Direction.NORTHEAST);
-			assertNull(type3);
-		}
+		when(rc.getInfluence()).thenReturn(0);
+		when(rc.canBuildRobot(RobotType.POLITICIAN, d,inf)).thenReturn(false);
+		when(rc.canBuildRobot(RobotType.SLANDERER, d,inf)).thenReturn(false);
+		when(rc.canBuildRobot(RobotType.MUCKRAKER, d,inf)).thenReturn(false);
+		when(rc.canSetFlag(1)).thenReturn(true);
+		EnlightenmentCenter.run(rc);
+		type0 = ec.makePol(rc, 0, 0, Direction.NORTHEAST);
+		assertNull(type0);
+		type1 = ec.makeSlan(rc, 0, 1, Direction.NORTHEAST);
+		assertNull(type1);
+		type2 = ec.makeMuck(rc, 0, 2, Direction.NORTHEAST);
+		assertNull(type2);
+		type3 = ec.makePol(rc,0,  3, Direction.NORTHEAST);
+		assertNull(type3);
+
 	}
 
 	@Test
