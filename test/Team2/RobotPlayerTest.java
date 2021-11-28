@@ -191,7 +191,7 @@ public class RobotPlayerTest {
 		ec = mock(EnlightenmentCenter.class);
 		rc = mock(RobotController.class);
 		ec.run(rc, 300);
-		ec.run(rc, 900);
+		ec.run(rc, 700);
 		ec.run(rc, 1300);
 	}
 
