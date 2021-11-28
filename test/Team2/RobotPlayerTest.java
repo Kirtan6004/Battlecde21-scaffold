@@ -114,78 +114,85 @@ public class RobotPlayerTest {
 	}
 
 	@Test
-	public void testRobotCreation() throws GameActionException {
-		testplayer = mock(RobotPlayer.class);
-		rc = mock(RobotController.class);
+	public void ecFtMakeRobots() throws GameActionException
+	{
 		ec = mock(EnlightenmentCenter.class);
-
-		if (rc.getInfluence() >= 100) {
-			ec.run(rc);
-			RobotType type0 = ec.makePol(rc,0, 0,Direction.NORTHEAST);
-			assertEquals(RobotType.POLITICIAN, type0);
-			RobotType type1 = ec.makeSlan(rc, 0, 1, Direction.NORTHEAST);
-			assertEquals(RobotType.SLANDERER, type1);
-			RobotType type2 = ec.makeMuck(rc, 0, 2, Direction.NORTHEAST);
-			assertEquals(RobotType.MUCKRAKER, type2);
-			RobotType type3 = ec.makePol(rc, 0, 3, Direction.NORTHEAST);
-			assertEquals(RobotType.POLITICIAN, type3);
-		} else {
-			EnlightenmentCenter.run(rc);
-			RobotType type0 = ec.makePol(rc, 0, 0, Direction.NORTHEAST);
-			assertNull(type0);
-			RobotType type1 = ec.makeSlan(rc, 0, 1, Direction.NORTHEAST);
-			assertNull(type1);
-			RobotType type2 = ec.makeMuck(rc, 0, 2, Direction.NORTHEAST);
-			assertNull(type2);
-			RobotType type3 = ec.makePol(rc,0,  3, Direction.NORTHEAST);
-			assertNull(type3);
-		}
+		rc = mock(RobotController.class);
+		Direction d = Direction.NORTHEAST;
+		ec.ftMakeRobots(rc, d, 0, true, true);
+		ec.ftMakeRobots(rc, d, 1, true, true);
+		ec.ftMakeMuck(rc, d, 20, 0, true);
 	}
 
 	@Test
-	public void testPolCreation() throws GameActionException {
-		testplayer = mock(RobotPlayer.class);
+	public void ecSdMakeRobots() throws GameActionException
+	{
 		ec = mock(EnlightenmentCenter.class);
 		rc = mock(RobotController.class);
-		MapLocation mapLocation = new MapLocation(2,2);
-		RobotInfo ec = new RobotInfo(1, Team.A, RobotType.ENLIGHTENMENT_CENTER,200, 100, mapLocation);
-		assertEquals(200, ec.getInfluence());
-		rc.buildRobot(RobotType.ENLIGHTENMENT_CENTER, Direction.NORTHEAST, 200);
-		RobotType ret = EnlightenmentCenter.makePol(rc,0,  3, Direction.NORTHEAST);
-		if (rc.getInfluence() >= 100) {
-			assertEquals(RobotType.POLITICIAN, ret);
-		}
-		else {
-			assertNull(ret);
-		}
+		Direction d = Direction.NORTHEAST;
+		ec.sdMakeRobots(rc, d, true, true, 2);
+		ec.sdMakeRobots(rc, d, true, true, 10);
+		ec.sdMakeSlan(rc, d, true, 5);
 	}
 
 	@Test
-	public void testSlandCreation() throws GameActionException {
-		testplayer = mock(RobotPlayer.class);
+	public void ecLtMakeRobotsTest() throws GameActionException
+	{
 		ec = mock(EnlightenmentCenter.class);
 		rc = mock(RobotController.class);
-		RobotType ret = EnlightenmentCenter.makeSlan(rc, 0, 3, Direction.NORTHEAST);
-		if (rc.getInfluence() >= 100) {
-			assertEquals(RobotType.SLANDERER, ret);
-		}
-		else {
-			assertNull(ret);
-		}
+		ec.ltMakeRobots(rc, Direction.NORTHEAST, 200, true, true);
+		ec.ltMakePol(rc, Direction.NORTHEAST, 200, true);
 	}
 
 	@Test
-	public void testMuckCreation() throws GameActionException {
-		testplayer = mock(RobotPlayer.class);
+	public void ecBidTest() throws GameActionException
+	{
 		ec = mock(EnlightenmentCenter.class);
 		rc = mock(RobotController.class);
-		RobotType ret = EnlightenmentCenter.makeMuck(rc, 0, 3, Direction.NORTHEAST);
-		if (rc.getInfluence() >= 100) {
-			assertEquals(RobotType.MUCKRAKER, ret);
-		}
-		else {
-			assertNull(ret);
-		}
+		ec.ecBid(rc, 50, 100);
+	}
+
+	@Test
+	public void ecMakeRobotsTest() throws GameActionException
+	{
+		ec = mock(EnlightenmentCenter.class);
+		rc = mock(RobotController.class);
+		Direction d = Direction.NORTHEAST;
+		assertEquals(RobotType.SLANDERER, ec.makeSlan(rc, 0, 2, d, true));
+		assertEquals(RobotType.MUCKRAKER, ec.makeMuck(rc, 0, 1, d, true));
+		assertEquals(RobotType.POLITICIAN, ec.makePol(rc, 0, 3, d, true));
+	}
+
+	@Test
+	public void ecFlagTest() throws GameActionException
+	{
+		ec = mock(EnlightenmentCenter.class);
+		rc = mock(RobotController.class);
+		RobotType r = RobotType.POLITICIAN;
+		assertEquals(r, ec.makeFlag(rc, 0, Direction.NORTHEAST, r, 3));
+		RobotType r2 = RobotType.SLANDERER;
+		assertEquals(r2, ec.makeFlag(rc, 0, Direction.NORTHEAST, r2, 2));
+		ec.justMakeFlag(rc, 0, true, 2);
+	}
+
+	@Test
+	public void ecThirdsTest() throws GameActionException
+	{
+		ec = mock(EnlightenmentCenter.class);
+		rc = mock(RobotController.class);
+		ec.firstThird(rc, 51);
+		ec.secondThird(rc, 110);
+		ec.lastThird(rc, 95);
+	}
+
+	@Test
+	public void ecRunTest() throws GameActionException
+	{
+		ec = mock(EnlightenmentCenter.class);
+		rc = mock(RobotController.class);
+		ec.run(rc, 300);
+		ec.run(rc, 700);
+		ec.run(rc, 1300);
 	}
 
 	@Test
