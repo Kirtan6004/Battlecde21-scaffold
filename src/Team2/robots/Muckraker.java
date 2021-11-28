@@ -48,14 +48,14 @@ public class Muckraker extends AbstractRobot
 		*/
 		return retVal;
 	}
-	
+
 	/** Chase the slanderer. Return 1 if retval is 1 other wise return 2*/
 	static int chaseSlanderer(RobotInfo robot, RobotController rc, int retval) throws GameActionException
 	{
 		chase(robot, rc);
 		return (retval == 1) ? 1 : retval;
 	}
-	
+
 	/** Exposes robot, returns 1*/
 	static int expose(RobotInfo robot, RobotController rc)
 	{
@@ -68,7 +68,7 @@ public class Muckraker extends AbstractRobot
 			return -1;
 		}
 	}
-	
+
 	static int canExposeSlanderer(RobotInfo robot, RobotController rc) throws GameActionException
 	{
 		if(isEnemy(robot, rc))
@@ -79,7 +79,7 @@ public class Muckraker extends AbstractRobot
 		}
 		return -1;
 	}
-	
+
 	/** Returns true if the robot type is exposable and the muckracker can expose them*/
 	static boolean exposable(RobotInfo robot, RobotController rc)
 	{

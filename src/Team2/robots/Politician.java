@@ -12,7 +12,7 @@ public class Politician extends AbstractRobot
 
     canattackanenemy(rc, actionRadius,enemy);
     empower(rc, actionRadius, rc.senseNearbyRobots(actionRadius,enemy),
-          rc.senseNearbyRobots(actionRadius, Team.NEUTRAL));
+            rc.senseNearbyRobots(actionRadius, Team.NEUTRAL));
     int turnCount = pursueNeutralECs(rc, rc.senseNearbyRobots(actionRadius,enemy), rc.senseNearbyRobots(actionRadius, Team.NEUTRAL));
     if( turnCount < 0)
     {
@@ -29,12 +29,12 @@ public class Politician extends AbstractRobot
    */
   public static int pursueNeutralECs(RobotController rc,RobotInfo[] enemy, RobotInfo[] neutral) throws GameActionException
   {
-      int turnCount = enemy.length + neutral.length;
-      if(turnCount <=12)
-        return -1;
-      else if(turnCount >800)
-        return 1;
-      return 0;
+    int turnCount = enemy.length + neutral.length;
+    if(turnCount <=12)
+      return -1;
+    else if(turnCount >800)
+      return 1;
+    return 0;
 //    if (turnCount <= 12) {
 //      for (RobotInfo ally :rc.senseNearbyRobots(2, allyTeam)) {
 //        if (ally.getType().canBid()){
