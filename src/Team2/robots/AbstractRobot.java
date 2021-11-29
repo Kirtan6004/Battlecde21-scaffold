@@ -246,7 +246,7 @@ public abstract class AbstractRobot
 
     /* check if robot(rc) is on the border of the map */
     //this method returns true if the coordinates is on the border else returns false
-    protected static boolean IsOnBorder(RobotController rc, MapLocation next) throws GameActionException {
+    public static boolean IsOnBorder(RobotController rc, MapLocation next) throws GameActionException {
         MapLocation ownLocation = rc.getLocation();
         if (next != null)
         {

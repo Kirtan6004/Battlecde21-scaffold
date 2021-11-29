@@ -242,7 +242,14 @@ public class RobotPlayerTest {
 	}
 	@Test
 	public void IsOnBorderTest() throws GameActionException{
-
+		rc = mock(RobotController.class);
+		MapLocation nextLocation = new MapLocation(2,2);
+		boolean isOb = AbstractRobot.IsOnBorder(rc, nextLocation);
+		assertEquals(false, isOb);
+		nextLocation = new MapLocation(0,0);
+		isOb = AbstractRobot.IsOnBorder(rc, nextLocation);
+		assertEquals(true, isOb);
+//		assertEquals(true, canMove);
 	}
 	@Test
 	public void tryMoveTest() throws GameActionException{
