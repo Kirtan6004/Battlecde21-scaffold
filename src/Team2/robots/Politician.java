@@ -18,9 +18,6 @@ public class Politician extends AbstractRobot
     {
       tryRandomMove(rc);
     }
-    else if(turnCount > 0){
-      Direction directionality = Direction.CENTER;
-    }
   }
 
   /**
