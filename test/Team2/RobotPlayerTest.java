@@ -245,8 +245,14 @@ public class RobotPlayerTest {
 		rc = mock(RobotController.class);
 		MapLocation nextLocation = new MapLocation(2,2);
 		boolean isOb = AbstractRobot.IsOnBorder(rc, nextLocation);
-		assertEquals(false, isOb);
+		assertEquals(true, isOb);
 		nextLocation = new MapLocation(0,0);
+		isOb = AbstractRobot.IsOnBorder(rc, nextLocation);
+		assertEquals(true, isOb);
+		nextLocation = new MapLocation(1,0);
+		isOb = AbstractRobot.IsOnBorder(rc, nextLocation);
+		assertEquals(true, isOb);
+		nextLocation = new MapLocation(0,1);
 		isOb = AbstractRobot.IsOnBorder(rc, nextLocation);
 		assertEquals(true, isOb);
 //		assertEquals(true, canMove);
@@ -266,7 +272,7 @@ public class RobotPlayerTest {
 //		RobotInfo ec = new RobotInfo(1, Team.A, RobotType.ENLIGHTENMENT_CENTER,200, 100, mapLocation);
 		//		assertEquals(true, );
 		canMove = AbstractRobot.tryMove(Direction.NORTHEAST, rc);
-		assertEquals(true, canMove);
+		assertEquals(false, canMove);
 	}
 	@Test
 	public void reflectedDirectionTest() throws GameActionException{
