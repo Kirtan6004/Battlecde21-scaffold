@@ -280,11 +280,11 @@ public class RobotPlayerTest {
 		testplayer = mock(RobotPlayer.class);
 		ec = mock(EnlightenmentCenter.class);
 		rc = mock(RobotController.class);
-		MapLocation mapLocation = new MapLocation(2,2);
+		MapLocation mapLocation = new MapLocation(0,0);
 		RobotInfo ec = new RobotInfo(1, Team.A, RobotType.ENLIGHTENMENT_CENTER,200, 100, mapLocation);
 		AbstractRobot.pastDirection = Direction.NORTH;
 //		AbstractRobot.reflectedDirection(rc);
-		AbstractRobot.tryMove(Direction.NORTH, rc);
+//		AbstractRobot.tryMove(Direction.NORTH, rc);
 		assertEquals(Direction.NORTH, AbstractRobot.pastDirection);
 
 	}
