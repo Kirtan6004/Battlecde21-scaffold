@@ -70,7 +70,7 @@ public strictfp class RobotPlayer {
     public static int switchType() throws GameActionException
     {
         switch (rc.getType()) {
-            case ENLIGHTENMENT_CENTER: EnlightenmentCenter.run(rc); return 0;
+            case ENLIGHTENMENT_CENTER: EnlightenmentCenter.run(rc, rc.getRoundNum()); return 0;
             case POLITICIAN:           Politician.run(rc);          return 1;
             case SLANDERER:            Slanderer.runSlanderer(rc);  return 2;
             case MUCKRAKER:            Muckraker.run(rc);           return 3;
