@@ -241,6 +241,10 @@ public class RobotPlayerTest {
 		return 1;
 	}
 	@Test
+	public void IsOnBorderTest() throws GameActionException{
+
+	}
+	@Test
 	public void tryMoveTest() throws GameActionException{
 
 //		AbstractRobot tempBot = null;
