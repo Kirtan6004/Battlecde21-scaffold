@@ -30,17 +30,30 @@ public class RobotPlayerTest {
 	Slanderer slandererplayer;
 	Politician politicianplayer;
 
+
 	@Test
 	public void runMuckrakerTest() throws GameActionException
 	{
 		testplayer = mock(RobotPlayer.class);
 		testplayer.rc = mock(RobotController.class);
-		when(testplayer.rc.getType()).thenReturn(RobotType.MUCKRAKER);
+		when(testplayer.rc.getType()).thenReturn(null);
 		when(testplayer.rc.getTeam()).thenReturn(Team.A);
 		when(testplayer.rc.getLocation()).thenReturn(new MapLocation(0,0));
-
+		testMuckRun(testplayer);
 		muckrackerSlanderTest();
 		muckrackerECTest();
+	}
+
+	/**test the run(rc) function specifically*/
+	private void testMuckRun(RobotPlayer rp) throws GameActionException
+	{
+		MapLocation far = new MapLocation(10,10);
+		RobotInfo[] invalid = {
+				  new RobotInfo(1, Team.B, RobotType.POLITICIAN, 10, 10, far)
+		};
+		when(rp.rc.senseNearbyRobots(RobotType.MUCKRAKER.detectionRadiusSquared)).thenReturn(invalid);
+		when(rp.rc.getType()).thenReturn(RobotType.MUCKRAKER);
+		Muckraker.run(rp.rc);
 	}
 
 	private void muckrackerSlanderTest() throws GameActionException
@@ -54,6 +67,9 @@ public class RobotPlayerTest {
 		RobotInfo[] robots2 = {
 				  new RobotInfo(3, Team.B, RobotType.SLANDERER,10,10, far)
 		};
+		RobotInfo[] friendly = {
+				  new RobotInfo(4, Team.A, RobotType.SLANDERER,10,10, far)
+		};
 		RobotInfo[] invalid = {
 				  new RobotInfo(1, Team.B, RobotType.POLITICIAN, 10, 10, near)
 		};
@@ -65,6 +81,9 @@ public class RobotPlayerTest {
 		assertEquals(-2, reaction);
 		//nothing in range
 		reaction = muckraker.dealWithSlanderer(empty, testplayer.rc);
+		assertEquals(-1, reaction);
+		//friendly units
+		reaction = muckraker.dealWithSlanderer(friendly, testplayer.rc);
 		assertEquals(-1, reaction);
 		//slanderer is close enough to convert
 		when(testplayer.rc.canExpose(near)).thenReturn(true);
@@ -156,6 +175,37 @@ public class RobotPlayerTest {
 	public void ecMakeRobotsTest() throws GameActionException
 	{
 		ec = mock(EnlightenmentCenter.class);
+		Direction d = Direction.NORTHEAST;
+		int inf = 50;
+		when(rc.canBuildRobot(RobotType.POLITICIAN, d,inf)).thenReturn(true);
+		when(rc.canBuildRobot(RobotType.SLANDERER, d,inf)).thenReturn(true);
+		when(rc.canBuildRobot(RobotType.MUCKRAKER, d,inf)).thenReturn(true);
+		when(rc.getInfluence()).thenReturn(100);
+		ec.run(rc);
+		RobotType type0 = ec.makePol(rc,0, 0,Direction.NORTHEAST);
+		assertEquals(RobotType.POLITICIAN, type0);
+		RobotType type1 = ec.makeSlan(rc, 0, 1, Direction.NORTHEAST);
+		assertEquals(RobotType.SLANDERER, type1);
+		RobotType type2 = ec.makeMuck(rc, 0, 2, Direction.NORTHEAST);
+		assertEquals(RobotType.MUCKRAKER, type2);
+		RobotType type3 = ec.makePol(rc, 0, 3, Direction.NORTHEAST);
+		assertEquals(RobotType.POLITICIAN, type3);
+
+		when(rc.getInfluence()).thenReturn(0);
+		when(rc.canBuildRobot(RobotType.POLITICIAN, d,inf)).thenReturn(false);
+		when(rc.canBuildRobot(RobotType.SLANDERER, d,inf)).thenReturn(false);
+		when(rc.canBuildRobot(RobotType.MUCKRAKER, d,inf)).thenReturn(false);
+		when(rc.canSetFlag(1)).thenReturn(true);
+		EnlightenmentCenter.run(rc);
+		type0 = ec.makePol(rc, 0, 0, Direction.NORTHEAST);
+		assertNull(type0);
+		type1 = ec.makeSlan(rc, 0, 1, Direction.NORTHEAST);
+		assertNull(type1);
+		type2 = ec.makeMuck(rc, 0, 2, Direction.NORTHEAST);
+		assertNull(type2);
+		type3 = ec.makePol(rc,0,  3, Direction.NORTHEAST);
+		assertNull(type3);
+
 		rc = mock(RobotController.class);
 		Direction d = Direction.NORTHEAST;
 		assertEquals(RobotType.SLANDERER, ec.makeSlan(rc, 0, 2, d, true));
@@ -201,139 +251,119 @@ public class RobotPlayerTest {
 		testplayer = mock(RobotPlayer.class);
 		slandererplayer = mock(Slanderer.class);
 		rc = mock(RobotController.class);
-		int tempradius = -1;
 		Team teamA = Team.A;
-		int ID = 1;
 		RobotType robottype = RobotType.MUCKRAKER;
-		int influence = 50;
-		int conviction = 10;
 		MapLocation mapLocation = new MapLocation(2,2);
-		MapLocation enemylocation = new MapLocation(10,10);
-		RobotInfo[] enemiespresent = new RobotInfo[1];
+		MapLocation loc1 = new MapLocation(10,10);
+		MapLocation loc2 = new MapLocation(1,1);
+		RobotInfo[] enemiespresent = new RobotInfo[2];
+		enemiespresent[0] = new RobotInfo(1, teamA, robottype, 1,1, loc1);
+		enemiespresent[1] = new RobotInfo(2, teamA, robottype, 1, 1, loc2);
 		RobotInfo[] enemiesnotpresent = {};
-		enemiespresent[0] = new RobotInfo(ID, teamA, robottype, influence, conviction, enemylocation);
-		when(rc.senseNearbyRobots( tempradius, teamA)).thenReturn(enemiespresent);
+		when(rc.senseNearbyRobots( -1, teamA)).thenReturn(enemiespresent);
 		when(rc.getLocation()).thenReturn(new MapLocation(0, 0));
-		int dangerX = ChangeXCoordinates(enemylocation, mapLocation);
-		assertEquals(1, dangerX);
-		int dangerY = ChangeYCoordinates(enemylocation, mapLocation);
 		int result = slandererplayer.WhenOpponentsAreFound(enemiespresent, mapLocation, rc);
-		assertEquals(1, dangerY);
 		assertEquals(1, result);
 		result = slandererplayer.WhenOpponentsAreFound(enemiesnotpresent, mapLocation, rc);
 		assertEquals(-1, result);
+
+		testSlandererRun();
 	}
-	private int ChangeXCoordinates(MapLocation enemyloc, MapLocation location)
+
+	private void testSlandererRun() throws GameActionException
 	{
-		int dangerX = 0;
-		if(enemyloc.x > location.x)
-		{
-			dangerX--;
-		}
-		else
-		{
-			dangerX++;
-		}
-		return 1;
+		testplayer = mock(RobotPlayer.class);
+		rc = mock(RobotController.class);
+		when(rc.getTeam()).thenReturn(Team.A);
+		when(rc.getLocation()).thenReturn(new MapLocation(0,0));
+		when(rc.senseNearbyRobots(-1,rc.getTeam().opponent()))
+				  .thenReturn(new RobotInfo[]{});
+		Slanderer.runSlanderer(rc);
 	}
-	private int ChangeYCoordinates(MapLocation enemyloc, MapLocation location)
+
+	@Test
+	public void politicianTest() throws GameActionException
 	{
-		int dangerY = 0;
-		if (enemyloc.y > location.y)
-		{
-			dangerY--;
-		}
-		else
-		{
-			dangerY++;
-		}
-		return 1;
-	}
 
+		rc = mock(RobotController.class);
+		politicianplayer = mock(Politician.class);
+		Team teamB = Team.B;
+		Team neutralteam = Team.NEUTRAL;
+		int ID = 1;
+		int tempradius = -1;
+		RobotType robottype = RobotType.POLITICIAN;
+		int influence = 111;
+		int conviction = 80;
+		MapLocation mapLocation = new MapLocation(0,0);
+		MapLocation enemylocation = new MapLocation(1,1);
+		RobotInfo[] enemies = new RobotInfo[1];
+		RobotInfo[] neutral = new RobotInfo[1];
+		RobotInfo[] neutralivalid = new RobotInfo[0];
+		RobotInfo[] enemyinvalid = new RobotInfo[0];
+		neutral[0] = new RobotInfo(2, neutralteam, robottype, 100, 100, enemylocation);
+		enemies[0] = new RobotInfo(ID, teamB, robottype, influence, conviction, enemylocation);
+		RobotInfo[] attackableEC = new RobotInfo[1];
+		RobotInfo[] attackableNonEC = new RobotInfo[1];
+		RobotInfo[] Invalidattackable= new RobotInfo[0];
+		attackableEC[0] = new RobotInfo(ID, teamB, RobotType.ENLIGHTENMENT_CENTER, influence, conviction, enemylocation);
+		boolean canempowerreturnvalue = true;
+		when(rc.canEmpower(10)).thenReturn(canempowerreturnvalue);
+		when(rc.senseNearbyRobots(10, teamB)).thenReturn(attackableEC);
 
-		@Test
-		public void politicianTest() throws GameActionException
-		{
+		//Testing for canattackanenemy method
+		int resultCanAttackEnemy = politicianplayer.canattackanenemy(rc, 10, teamB);
+		assertEquals(1, resultCanAttackEnemy);
+		attackableNonEC[0] = new RobotInfo(ID, teamB, robottype, influence, conviction, enemylocation);
+		when(rc.senseNearbyRobots(10, teamB)).thenReturn(attackableNonEC);
+		resultCanAttackEnemy = politicianplayer.canattackanenemy(rc, 10, teamB);
+		assertEquals(0, resultCanAttackEnemy);
+		when(rc.senseNearbyRobots(10, teamB)).thenReturn(Invalidattackable);
+		resultCanAttackEnemy = politicianplayer.canattackanenemy(rc, 10, teamB);
+		assertEquals(-1, resultCanAttackEnemy);
 
-			rc = mock(RobotController.class);
-			politicianplayer = mock(Politician.class);
-			Team teamB = Team.B;
-			Team neutralteam = Team.NEUTRAL;
-			int ID = 1;
-			int tempradius = -1;
-			RobotType robottype = RobotType.POLITICIAN;
-			int influence = 111;
-			int conviction = 80;
-			MapLocation mapLocation = new MapLocation(0,0);
-			MapLocation enemylocation = new MapLocation(1,1);
-			RobotInfo[] enemies = new RobotInfo[1];
-			RobotInfo[] neutral = new RobotInfo[1];
-			RobotInfo[] neutralivalid = new RobotInfo[0];
-			RobotInfo[] enemyinvalid = new RobotInfo[0];
-			neutral[0] = new RobotInfo(2, neutralteam, robottype, 100, 100, enemylocation);
-			enemies[0] = new RobotInfo(ID, teamB, robottype, influence, conviction, enemylocation);
-			RobotInfo[] attackableEC = new RobotInfo[1];
-			RobotInfo[] attackableNonEC = new RobotInfo[1];
-			RobotInfo[] Invalidattackable= new RobotInfo[0];
-			attackableEC[0] = new RobotInfo(ID, teamB, RobotType.ENLIGHTENMENT_CENTER, influence, conviction, enemylocation);
-			boolean canempowerreturnvalue = true;
-			when(rc.canEmpower(10)).thenReturn(canempowerreturnvalue);
-			when(rc.senseNearbyRobots(10, teamB)).thenReturn(attackableEC);
+		//Testing for canempower method
+		boolean canempowertrue = true;
+		boolean canempowerfalse = false;
+		when(rc.canEmpower(10)).thenReturn(canempowertrue);
+		int empowerresult = politicianplayer.empower(rc, 10, enemies, neutral);
+		assertEquals(1, empowerresult);
+		empowerresult = politicianplayer.empower(rc, 10, enemyinvalid, neutralivalid);
+		assertEquals(0, empowerresult);
+		when(rc.canEmpower(10)).thenReturn(canempowerfalse);
+		empowerresult = politicianplayer.empower(rc, 10, enemyinvalid, neutralivalid);
+		assertEquals(-1, empowerresult);
 
-			//Testing for canattackanenemy method
-			int resultCanAttackEnemy = politicianplayer.canattackanenemy(rc, 10, teamB);
-			assertEquals(1, resultCanAttackEnemy);
-			attackableNonEC[0] = new RobotInfo(ID, teamB, robottype, influence, conviction, enemylocation);
-			when(rc.senseNearbyRobots(10, teamB)).thenReturn(attackableNonEC);
-			resultCanAttackEnemy = politicianplayer.canattackanenemy(rc, 10, teamB);
-			assertEquals(0, resultCanAttackEnemy);
-			when(rc.senseNearbyRobots(10, teamB)).thenReturn(Invalidattackable);
-			resultCanAttackEnemy = politicianplayer.canattackanenemy(rc, 10, teamB);
-			assertEquals(-1, resultCanAttackEnemy);
-
-			//Testing for canempower method
-			boolean canempowertrue = true;
-			boolean canempowerfalse = false;
-			when(rc.canEmpower(10)).thenReturn(canempowertrue);
-			int empowerresult = politicianplayer.empower(rc, 10, enemies, neutral);
-			assertEquals(1, empowerresult);
-			empowerresult = politicianplayer.empower(rc, 10, enemyinvalid, neutralivalid);
-			assertEquals(0, empowerresult);
-			when(rc.canEmpower(10)).thenReturn(canempowerfalse);
-			empowerresult = politicianplayer.empower(rc, 10, enemyinvalid, neutralivalid);
-			assertEquals(-1, empowerresult);
-
-			//Testing for pursueNeutralECs
-			int turnCount = 10;
+		//Testing for pursueNeutralECs
+		int turnCount = 10;
 //			int turnCount2 = 900;
 //			int turncount3 = 0;
-			RobotInfo[] validenemy = new RobotInfo[10];
-			RobotInfo[] validneutral = new RobotInfo[10];
-			RobotInfo[] Invalidenemy = new RobotInfo[500];
-			RobotInfo[] Invalidneutral = new RobotInfo[500];
-			int pursueNeutralECResult = politicianplayer.pursueNeutralECs(rc, enemies, neutral);
-			assertEquals(-1, pursueNeutralECResult);
-			pursueNeutralECResult = politicianplayer.pursueNeutralECs(rc, validenemy, validneutral);
-			assertEquals(0, pursueNeutralECResult);
-			pursueNeutralECResult = politicianplayer.pursueNeutralECs(rc, Invalidenemy, Invalidneutral);
-			assertEquals(1, pursueNeutralECResult);
+		RobotInfo[] validenemy = new RobotInfo[10];
+		RobotInfo[] validneutral = new RobotInfo[10];
+		RobotInfo[] Invalidenemy = new RobotInfo[500];
+		RobotInfo[] Invalidneutral = new RobotInfo[500];
+		int pursueNeutralECResult = politicianplayer.pursueNeutralECs(rc, enemies, neutral);
+		assertEquals(-1, pursueNeutralECResult);
+		pursueNeutralECResult = politicianplayer.pursueNeutralECs(rc, validenemy, validneutral);
+		assertEquals(0, pursueNeutralECResult);
+		pursueNeutralECResult = politicianplayer.pursueNeutralECs(rc, Invalidenemy, Invalidneutral);
+		assertEquals(1, pursueNeutralECResult);
 
-			//Testing run() method
+		//Testing run() method
 //			//Team opponent = Team.A;
 //			int actionradiussquared = 10;
 //			when(rc.getTeam().opponent()).thenReturn((teamB));
-			//when(rc.getType().actionRadiusSquared).thenReturn(actionradiussquared);
-			when(rc.senseNearbyRobots(10, neutralteam)).thenReturn(neutral);
-			when(rc.senseNearbyRobots(10, teamB)).thenReturn(attackableNonEC);
+		//when(rc.getType().actionRadiusSquared).thenReturn(actionradiussquared);
+		when(rc.senseNearbyRobots(10, neutralteam)).thenReturn(neutral);
+		when(rc.senseNearbyRobots(10, teamB)).thenReturn(attackableNonEC);
 //			int turncountcheckinvalid = -10;
 //			when(politicianplayer.pursueNeutralECs(rc, attackableNonEC, neutral)).thenReturn(turncountcheckinvalid);
-			int turncountcheckvalid = 10;
-			when(rc.senseNearbyRobots(10,teamB)).thenReturn(attackableEC);
-			when(rc.senseNearbyRobots(10, neutralteam)).thenReturn(attackableNonEC);
+		int turncountcheckvalid = 10;
+		when(rc.senseNearbyRobots(10,teamB)).thenReturn(attackableEC);
+		when(rc.senseNearbyRobots(10, neutralteam)).thenReturn(attackableNonEC);
 //			when(politicianplayer.pursueNeutralECs(rc, value1, value1)).thenReturn(turncountcheckvalid);
 
 
-		}
+	}
 
 
 }

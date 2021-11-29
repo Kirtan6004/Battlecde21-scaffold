@@ -32,8 +32,6 @@ public strictfp class RobotPlayer {
     static int influence = 100;
     // Add New Var on here
 
-    static Set<Integer> flagsSeen = new HashSet<Integer>();
-
     public static int lastRobot = 0;
 
     /**
@@ -57,12 +55,7 @@ public strictfp class RobotPlayer {
                 // Here, we've separated the controls into a different method for each RobotType.
                 // You may rewrite this into your own control structure if you wish.
                 //System.out.println("I'm a " + rc.getType() + "! Location " + rc.getLocation());
-                switch (rc.getType()) {
-                    case ENLIGHTENMENT_CENTER: EnlightenmentCenter.run(rc, rc.getRoundNum()); break;
-                    case POLITICIAN:           Politician.run(rc);       break;
-                    case SLANDERER:            Slanderer.runSlanderer(rc);break;
-                    case MUCKRAKER:            Muckraker.run(rc);        break;
-                }
+                switchType();
 
                 // Clock.yield() makes the robot wait until the next turn, then it will perform this loop again
                 Clock.yield();
@@ -72,5 +65,16 @@ public strictfp class RobotPlayer {
                 e.printStackTrace();
             }
         }
+    }
+
+    public static int switchType() throws GameActionException
+    {
+        switch (rc.getType()) {
+            case ENLIGHTENMENT_CENTER: EnlightenmentCenter.run(rc); return 0;
+            case POLITICIAN:           Politician.run(rc);          return 1;
+            case SLANDERER:            Slanderer.runSlanderer(rc);  return 2;
+            case MUCKRAKER:            Muckraker.run(rc);           return 3;
+        }
+        return -1;
     }
 }
