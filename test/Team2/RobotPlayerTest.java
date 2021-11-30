@@ -3,10 +3,7 @@ package Team2;
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
 
-import Team2.robots.EnlightenmentCenter;
-import Team2.robots.Muckraker;
-import Team2.robots.Slanderer;
-import Team2.robots.Politician;
+import Team2.robots.*;
 import battlecode.common.*;
 import org.junit.Rule;
 import static org.mockito.Mockito.when;
@@ -30,17 +27,30 @@ public class RobotPlayerTest {
 	Slanderer slandererplayer;
 	Politician politicianplayer;
 
+
 	@Test
 	public void runMuckrakerTest() throws GameActionException
 	{
 		testplayer = mock(RobotPlayer.class);
 		testplayer.rc = mock(RobotController.class);
-		when(testplayer.rc.getType()).thenReturn(RobotType.MUCKRAKER);
+		when(testplayer.rc.getType()).thenReturn(null);
 		when(testplayer.rc.getTeam()).thenReturn(Team.A);
 		when(testplayer.rc.getLocation()).thenReturn(new MapLocation(0,0));
-
+		testMuckRun(testplayer);
 		muckrackerSlanderTest();
 		muckrackerECTest();
+	}
+
+	/**test the run(rc) function specifically*/
+	private void testMuckRun(RobotPlayer rp) throws GameActionException
+	{
+		MapLocation far = new MapLocation(10,10);
+		RobotInfo[] invalid = {
+				new RobotInfo(1, Team.B, RobotType.POLITICIAN, 10, 10, far)
+		};
+		when(rp.rc.senseNearbyRobots(RobotType.MUCKRAKER.detectionRadiusSquared)).thenReturn(invalid);
+		when(rp.rc.getType()).thenReturn(RobotType.MUCKRAKER);
+		Muckraker.run(rp.rc);
 	}
 
 	private void muckrackerSlanderTest() throws GameActionException
@@ -54,6 +64,9 @@ public class RobotPlayerTest {
 		RobotInfo[] robots2 = {
 				new RobotInfo(3, Team.B, RobotType.SLANDERER,10,10, far)
 		};
+		RobotInfo[] friendly = {
+				new RobotInfo(4, Team.A, RobotType.SLANDERER,10,10, far)
+		};
 		RobotInfo[] invalid = {
 				new RobotInfo(1, Team.B, RobotType.POLITICIAN, 10, 10, near)
 		};
@@ -65,6 +78,9 @@ public class RobotPlayerTest {
 		assertEquals(-2, reaction);
 		//nothing in range
 		reaction = muckraker.dealWithSlanderer(empty, testplayer.rc);
+		assertEquals(-1, reaction);
+		//friendly units
+		reaction = muckraker.dealWithSlanderer(friendly, testplayer.rc);
 		assertEquals(-1, reaction);
 		//slanderer is close enough to convert
 		when(testplayer.rc.canExpose(near)).thenReturn(true);
@@ -201,55 +217,35 @@ public class RobotPlayerTest {
 		testplayer = mock(RobotPlayer.class);
 		slandererplayer = mock(Slanderer.class);
 		rc = mock(RobotController.class);
-		int tempradius = -1;
 		Team teamA = Team.A;
-		int ID = 1;
 		RobotType robottype = RobotType.MUCKRAKER;
-		int influence = 50;
-		int conviction = 10;
 		MapLocation mapLocation = new MapLocation(2,2);
-		MapLocation enemylocation = new MapLocation(10,10);
-		RobotInfo[] enemiespresent = new RobotInfo[1];
+		MapLocation loc1 = new MapLocation(10,10);
+		MapLocation loc2 = new MapLocation(1,1);
+		RobotInfo[] enemiespresent = new RobotInfo[2];
+		enemiespresent[0] = new RobotInfo(1, teamA, robottype, 1,1, loc1);
+		enemiespresent[1] = new RobotInfo(2, teamA, robottype, 1, 1, loc2);
 		RobotInfo[] enemiesnotpresent = {};
-		enemiespresent[0] = new RobotInfo(ID, teamA, robottype, influence, conviction, enemylocation);
-		when(rc.senseNearbyRobots( tempradius, teamA)).thenReturn(enemiespresent);
+		when(rc.senseNearbyRobots( -1, teamA)).thenReturn(enemiespresent);
 		when(rc.getLocation()).thenReturn(new MapLocation(0, 0));
-		int dangerX = ChangeXCoordinates(enemylocation, mapLocation);
-		assertEquals(1, dangerX);
-		int dangerY = ChangeYCoordinates(enemylocation, mapLocation);
 		int result = slandererplayer.WhenOpponentsAreFound(enemiespresent, mapLocation, rc);
-		assertEquals(1, dangerY);
 		assertEquals(1, result);
 		result = slandererplayer.WhenOpponentsAreFound(enemiesnotpresent, mapLocation, rc);
 		assertEquals(-1, result);
-	}
-	private int ChangeXCoordinates(MapLocation enemyloc, MapLocation location)
-	{
-		int dangerX = 0;
-		if(enemyloc.x > location.x)
-		{
-			dangerX--;
-		}
-		else
-		{
-			dangerX++;
-		}
-		return 1;
-	}
-	private int ChangeYCoordinates(MapLocation enemyloc, MapLocation location)
-	{
-		int dangerY = 0;
-		if (enemyloc.y > location.y)
-		{
-			dangerY--;
-		}
-		else
-		{
-			dangerY++;
-		}
-		return 1;
+
+		testSlandererRun();
 	}
 
+	private void testSlandererRun() throws GameActionException
+	{
+		testplayer = mock(RobotPlayer.class);
+		rc = mock(RobotController.class);
+		when(rc.getTeam()).thenReturn(Team.A);
+		when(rc.getLocation()).thenReturn(new MapLocation(0,0));
+		when(rc.senseNearbyRobots(-1,rc.getTeam().opponent()))
+				.thenReturn(new RobotInfo[]{});
+		Slanderer.runSlanderer(rc);
+	}
 
 	@Test
 	public void politicianTest() throws GameActionException
@@ -334,6 +330,54 @@ public class RobotPlayerTest {
 
 
 	}
+//	@Test
+//	public void IsOnBorderTest() throws GameActionException{
+//		rc = mock(RobotController.class);
+//		MapLocation nextLocation = new MapLocation(2,2);
+//		boolean isOb = AbstractRobot.IsOnBorder(rc, nextLocation);
+//		assertEquals(true, isOb);
+//		nextLocation = new MapLocation(0,0);
+//		isOb = AbstractRobot.IsOnBorder(rc, nextLocation);
+//		assertEquals(true, isOb);
+//		nextLocation = new MapLocation(1,0);
+//		isOb = AbstractRobot.IsOnBorder(rc, nextLocation);
+//		assertEquals(true, isOb);
+//		nextLocation = new MapLocation(0,1);
+//		isOb = AbstractRobot.IsOnBorder(rc, nextLocation);
+//		assertEquals(true, isOb);
+////		assertEquals(true, canMove);
+//	}
 
+	@Test
+	public void tryMoveTest() throws GameActionException{
+
+//		AbstractRobot tempBot = null;
+		boolean canMove = AbstractRobot.tryMove(Direction.NORTHEAST,rc);
+		rc = null;
+		assertEquals(false, canMove);
+		MapLocation mapLocation = new MapLocation(2,2);
+		RobotInfo ec = new RobotInfo(1, Team.A, RobotType.ENLIGHTENMENT_CENTER,200, 100, mapLocation);
+		testplayer = mock(RobotPlayer.class);
+//		ec = mock(EnlightenmentCenter.class);
+		rc = mock(RobotController.class);
+//		RobotInfo ec = new RobotInfo(1, Team.A, RobotType.ENLIGHTENMENT_CENTER,200, 100, mapLocation);
+		//		assertEquals(true, );
+		canMove = AbstractRobot.tryMove(Direction.NORTHEAST, rc);
+		assertEquals(false, canMove);
+	}
+	@Test
+	public void reflectedDirectionTest() throws GameActionException{
+		AbstractRobot tempBot = null;
+		testplayer = mock(RobotPlayer.class);
+		ec = mock(EnlightenmentCenter.class);
+		rc = mock(RobotController.class);
+		MapLocation mapLocation = new MapLocation(0,0);
+		RobotInfo ec = new RobotInfo(1, Team.A, RobotType.ENLIGHTENMENT_CENTER,200, 100, mapLocation);
+		AbstractRobot.pastDirection = Direction.NORTH;
+//		AbstractRobot.reflectedDirection(rc);
+//		AbstractRobot.tryMove(Direction.NORTH, rc);
+		assertEquals(Direction.NORTH, AbstractRobot.pastDirection);
+
+	}
 
 }
